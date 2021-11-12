@@ -1,0 +1,264 @@
+---
+title: "Data Wrangling"
+author: "Dan and Karla"
+date: "10/13/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Data wrangled by Dan
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(robotstxt)
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+```
+
+```{r check paths allowed for kickstarter}
+paths_allowed("https://www.kickstarter.com/discover/advanced?sort=magic&seed=2724714&page=1")
+```
+
+```{r file management}
+# get name of folder containing csv files
+root <- "kickstarter_raw_data"
+# recursively get the names of all kickstarter .csv files
+files <- dir(root, pattern='csv$', recursive = TRUE, full.names = TRUE) 
+# read in all the csv files and bind them to a data frame
+all_data <- files %>% 
+  map_dfr(read_csv)
+
+# read in country abbreviation table
+countryAbbrv <- read.csv("countryAbbrv.csv")
+```
+
+```{r wrangle}
+# remove unnecessary columns, small fixes to columns
+all_data <- all_data %>% 
+   mutate(goal_usd = goal * fx_rate, # convert goal to USD
+         pledged_usd = pledged * fx_rate, # convert pledge to USD
+         country_displayable_name = as.factor(country_displayable_name), # make into a factor
+         country_displayable_name = fct_recode(country_displayable_name, # fix some names
+                                               "United States" = "the United States", 
+                                               "United Kingdom" = "the United Kingdom",
+                                               "Netherlands" = "the Netherlands")) %>% 
+  select(-c("disable_communication",
+            "friends",
+            "is_backing",
+            "permissions",
+            "is_starrable",
+            "is_starred",
+            "creator",
+            "currency_trailing_code",
+            "static_usd_rate",
+            "slug",
+            "converted_pledged_amount", # remove b/c it doesn't use the supplied fx rate, not consistent
+            "usd_pledged", # doesn't use supplied fx rate, not consistent
+            "currency",
+            "current_currency",
+            "currency_symbol",
+            "state_changed_at",
+            "goal",
+            "profile",
+            "pledged",
+            "usd_type"
+            )) %>% 
+  rename(outcome = state) %>%
+  filter(outcome %in% c("successful", "failed")) # don't include ongoing, suspended, or canceled campaigns  
+
+all_data <- all_data[!duplicated(all_data$name), ] # remove duplicate companies 
+
+# convert Unix time stamps to POSIXct dates, get campaign_length, fix decimals
+all_data <- all_data %>% mutate(launched_at = as.POSIXct(as.numeric(launched_at), origin = "1970-01-01"),
+                    created_at = as.POSIXct(as.numeric(created_at), origin = "1970-01-01"),
+                    deadline = as.POSIXct(as.numeric(deadline), origin = "1970-01-01"),
+                                          campaign_length = difftime(deadline,launched_at, units = "days"),
+                    campaign_length = round(campaign_length, digits = 0), # remove decimals from days
+                    goal_usd = round(goal_usd, digits = 0),
+                    pledged_usd = round(pledged_usd, digits = 0)) 
+
+
+
+# get messy category vector
+categories <- all_data$category %>% as.list()
+
+# get both categories
+both_categories <- categories %>% 
+  str_split('\\",\\"') %>% 
+  map(2) %>%
+  substring(8, 1000L)
+
+# get main category (has a few NULL values)
+main_category <- categories %>% 
+  str_split('\\",\\"') %>% 
+  map(3) %>%
+  str_split('name\\":\\"') %>%
+  map(2) %>% 
+  as.character()
+
+# get subcategories
+sub_category <- categories %>% 
+  str_split('\\",\\"') %>% # split the string after the category
+  map(1) %>% # get the first element in the nested list 
+   str_extract(":\".*") # remove everything before the specified symbols
+sub_category <- sub_category %>%
+  substring(3, 1000L) 
+
+
+# get messy location vector
+location_list <- all_data$location %>% as.list()
+
+# get city 
+city <- location_list %>%
+  str_split('\\",\\"') %>%
+  map(5) %>%
+  substring(18, 1000L)
+
+# get state
+state <- location_list %>%
+  str_split('\\",\\"') %>%
+  map(7) %>%
+  substring(9, 1000L)
+
+# get country
+country_corrected <- location_list %>% 
+   str_split('\\",\\"') %>%
+  map(6) %>%
+  substring(11, 1000L) 
+
+
+# get messy photo link vector
+photo_list <- all_data$photo %>% as.list()
+
+# get photo links
+photo_links <- photo_list %>% 
+  str_split('\\",\\"') %>% 
+  map(2) %>%
+  substring(8, 1000L) 
+
+# get messy url link vector
+url_list <- all_data$urls %>% as.list()
+
+# get project page urls
+project_urls <- url_list %>%
+  str_split('\\",\\"') %>%
+  map(1) %>%
+  substring(20, 1000L)
+
+# get reward page urls
+reward_urls <- url_list %>%
+  str_split('\\",\\"') %>%
+  map(2) %>%
+  substring(19, 1000L) %>%
+  str_split('\\\"') %>%
+  map(1) %>%
+  as.character()
+
+# bind columns
+all_data <- cbind(all_data, both_categories, main_category, sub_category, city, state, photo_links, project_urls, reward_urls, country_corrected)
+
+# join country names - for fixed countries
+all_data <- left_join(all_data, countryAbbrv, by = c("country_corrected" = "Code")) %>% rename("country_displayName_corrected" = "Name")
+
+# remove unnecessary columns, remove NULLs & NAs
+all_data <- all_data %>% clean_names()
+all_data <- all_data %>% select(-c("category",
+                       "location",
+                       "photo",
+                       "urls")) %>%
+  filter(main_category != "NULL") 
+all_data <- all_data %>% na.omit()
+
+# make new ratio variable
+all_data <- all_data %>%
+  mutate(proportion_funded = pledged_usd / goal_usd,  # 0.1 = 10% funded, 2 = 200% funded
+         pct_funded = proportion_funded * 100,
+         proportion_funded = round(proportion_funded, digits = 4),
+         pct_funded = round(pct_funded, digits = 2))
+
+glimpse(all_data)
+```
+
+```{r country issue example}
+# EXAMPLE 1
+# this is messed up! the provided country name column is incorrect!
+all_data %>% 
+  filter(country_displayable_name == "United States") %>% distinct(state)
+
+# fixed it!!!
+all_data %>% 
+  filter(country_corrected == "US") %>% distinct(state)
+
+# EXAMPLE 2
+# Bangkok is not a US city!! this column is messed up! - must use newly made corrected column!
+all_data %>% 
+  filter(country == "US") %>% 
+  filter(city == "Bangkok") 
+```
+
+```{r EDA}
+# EDA of Kickstarter data
+
+# while the data was scraped in 2020, the projects range from 2009-2020
+all_data %>% distinct(year(launched_at)) %>% 
+  rename(year_launched = "year(launched_at)") %>%
+  arrange(desc(year_launched))
+
+# median campaign length by year
+```
+
+```{r sum tables EDA}
+# percentage of failed/successful kickstarter campaigns
+tabyl(all_data$outcome)
+
+# funding rates
+all_data %>% group_by(outcome) %>%
+  summarize(median_funding_rate = median(proportion_funded),
+            mean_funding_rate = mean(proportion_funded)) %>%
+  mutate(median_pct_goal_reached = median_funding_rate * 100,
+         mean_pct_goal_reached = mean_funding_rate * 100)
+
+# countries with the most successful campaigns 
+all_data %>% group_by(country_display_name_corrected, outcome) %>%
+  summarize(n = n()) %>% filter(outcome == "successful") %>%
+  arrange(desc(n))
+
+# Longer campaigns tend to be less successful
+# kickstarter shortened the max campaign length in 2011. The data supports their decision
+# https://www.kickstarter.com/blog/shortening-the-maximum-project-length
+all_data %>%
+  group_by(outcome) %>%
+  filter(year(launched_at) %in% c(2009:2011)) %>% # time when length was capped at 90 days
+  summarise(avg_length = mean(campaign_length),
+            median_length = median(campaign_length),
+            n = n())
+
+all_data %>%
+  group_by(outcome) %>%
+  filter(year(launched_at) %in% c(2012:2020)) %>% # time when length was capped at 60 days
+  summarise(avg_length = mean(campaign_length),
+            median_length = median(campaign_length),
+            n = n())
+
+# replicating the data presented in the kickstarter blog
+# success rate by various campaign lengths. Not enough data in the 90 day category to compare to the kickstarter blog
+all_data %>%
+  group_by(campaign_length) %>%
+  filter(campaign_length %in% c(15, 30, 45, 90)) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n)
+```
+
+```{r write csv}
+# write a csv of the big data frame
+# write_csv(all_data, "kickstarter_2020.csv")
+```
+
+
+
+
+

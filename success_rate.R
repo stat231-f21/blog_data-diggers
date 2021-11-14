@@ -33,7 +33,7 @@ all_states$state <- "All" #creates state column with "All" in each row
 all_states <- all_states %>% relocate(state, .after = country_display_name_corrected)
 
 # row bind the all table 
-us_success_by_cat <- rbind(us_success_by_cat, all_states)
+us_success_by_cat <- rbind(all_states, us_success_by_cat)
 
 # join in state names and clean
 us_success_by_cat <- left_join(us_success_by_cat, stateAbbrv, by = c("state" = "Code")) %>% 

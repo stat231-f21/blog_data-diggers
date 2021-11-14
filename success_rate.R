@@ -2,6 +2,7 @@
 library(tidyverse)
 
 kickstarter_data <- read.csv("kickstarter_2020.csv")
+stateAbbrv <- read.csv("stateAbbrv.csv") %>% select(-Abbrev)
 
 # 1 if successful, 0 if failed
 kickstarter_data <- kickstarter_data %>% mutate(binarySF = ifelse(outcome == "successful", 1, 0))
@@ -21,10 +22,33 @@ us_success_by_cat <- kickstarter_data %>%
   group_by(country_corrected, country_display_name_corrected, state, main_category) %>% 
   summarize(successRate = sum(binarySF)/n(),
             observations = n())
-us_success_by_cat
+
+# create table for all states
+all_states <- kickstarter_data %>% 
+  filter(country_corrected == "US") %>% 
+  group_by(country_corrected, country_display_name_corrected ,main_category) %>% 
+  summarize(successRate = sum(binarySF)/n(),
+            observations = n())
+all_states$state <- "All" #creates state column with "All" in each row
+all_states <- all_states %>% relocate(state, .after = country_display_name_corrected)
+
+# row bind the all table 
+us_success_by_cat <- rbind(us_success_by_cat, all_states)
+
+# join in state names and clean
+us_success_by_cat <- left_join(us_success_by_cat, stateAbbrv, by = c("state" = "Code")) %>% 
+  rename(state_code = state, state = State,
+         country_code = country_corrected, country = country_display_name_corrected,
+         success_rate = successRate) %>% 
+  relocate(state, .after = state_code)
+
+# fix NAs in state column for All
+us_success_by_cat <- us_success_by_cat %>% 
+  mutate(state = ifelse(state_code == "All", "All", state))
+
 
 ## write csv
-# write.csv(us_success_by_cat, "success_rate_tbl.csv")
+#write.csv(us_success_by_cat, "success_rate_tbl.csv")
 
 ## quick analysis examples
 # tech <- us_success_by_cat %>% filter(main_category == "Technology") %>% arrange(desc(successRate))

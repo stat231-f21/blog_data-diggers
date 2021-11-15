@@ -1,9 +1,5 @@
-
 library(shiny)
 library(DT)
-
-
-
 
 # DAN - import data
 success_tbl <- read.csv("success_rate_tbl.csv")
@@ -16,10 +12,10 @@ state_choices <- unique(success_tbl$state)
 #    ui    #
 ############
 ui <- fluidPage(
-
+    
     # Application title
     titlePanel("Success Rates by Category"),
-
+    
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
@@ -27,9 +23,9 @@ ui <- fluidPage(
                            label = "State",
                            choices = state_choices,
                            selected = "All",
-                           multiple = F),
+                           multiple = FALSE),
         ),
-
+        
         # data table
         mainPanel(DT::dataTableOutput(outputId = "table")
         )
@@ -41,8 +37,8 @@ ui <- fluidPage(
 ############
 # Define server logic required to make table
 server <- function(input, output) {
-
-    # make table
+    
+    # data for the table
     data_for_table <- reactive({
         #store user inputs
         state_input <- input$state
@@ -56,6 +52,7 @@ server <- function(input, output) {
                    Observations = observations)
     })
     
+    # make the table output
     output$table <- DT::renderDataTable({
         datatable(data_for_table(), escape = FALSE, # escape = FALSE allows links to be clickable
                   extensions = c("Buttons"), 

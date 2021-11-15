@@ -1,0 +1,37 @@
+---
+title: "None"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#loading packages
+library(tidyverse)
+library(dplyr)
+library(mosaic)
+library(ggplot2)
+library(shiny)
+library(maps)
+library(plotly)
+```
+
+```{r}
+new_data <- all_data %>%
+  select(c("country", "main_category", "state", "proportion_funded", "pct_funded")) %>%
+  filter(country == "US") %>%
+  mutate(state_name = tolower(state.name[match(state, state.abb)])) %>%
+  filter(main_category == "Food") 
+
+map <- map_data("state")
+
+kick_map <- ggplot(new_data, aes(fill = proportion_funded)) +
+  geom_map(aes(map_id = state_name), map = map) +
+  expand_limits(x = map$long, y = map$lat)
+
+print(kick_map)
+
+```
+

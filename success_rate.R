@@ -58,7 +58,6 @@ map_tbl <- left_join(map_tbl, stateAbbrv, by = c("state" = "Code")) %>%
 #write.csv(map_tbl, "map_tbl.csv")
 
 
-
 # For the SHINY TABLE
 # row bind the all table 
 us_success_by_cat <- rbind(all_states, us_success_by_cat)

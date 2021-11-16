@@ -1,5 +1,6 @@
 library(shiny)
 library(DT)
+library(tidyverse)
 
 # DAN - import data
 success_tbl <- read.csv("success_rate_tbl.csv")
@@ -46,6 +47,7 @@ server <- function(input, output) {
         data <- success_tbl %>% 
             filter(state %in% state_input) %>%
             arrange(desc(success_rate)) %>% 
+            mutate(success_rate = round(success_rate, digits = 4)) %>% 
             select(-c(X, country_code, country, state_code, state)) %>% 
             rename(Category = main_category, 
                    "Success Rate" = success_rate,

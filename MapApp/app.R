@@ -6,6 +6,7 @@ library(maps)
 library(plotly)
 library(leaflet)
 library(sf)
+library(RColorBrewer)
 
 # import data
 kickstarter <- read.csv("map_tbl.csv")
@@ -28,6 +29,9 @@ m <- st_as_sf(new_map)
 
 # Extract Unique Elements
 cat_choices <- unique(m$main_category)
+
+m <- m %>%
+  mutate(`Success Rate` = success_rate)
 
 ############
 #    ui    #
@@ -65,7 +69,7 @@ server <- function(input, output) {
     
     ggplot(new_map, aes(text = paste("State:", state,
                                      "</br>Observations:", observations))) + 
-      geom_sf(aes(fill = success_rate)) + 
+      geom_sf(aes(fill = `Success Rate`)) + 
       # make a plain theme
       theme(axis.line = element_blank(), axis.text.x = element_blank(),
             axis.text.y = element_blank(), axis.ticks = element_blank(),
@@ -74,7 +78,8 @@ server <- function(input, output) {
             panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             plot.background = element_blank()) +
       labs(title = paste("Success Rate for", input$widget, "Kickstarters in Each State"),
-           fill = "Success Rate")
+           fill = "Success Rate") +
+      scale_fill_distiller(palette = "Blues", direction = 1)
     
   })
 }

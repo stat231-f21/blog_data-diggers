@@ -26,11 +26,12 @@ new_map <- inner_join(kickstarter, state_info, by = "state")
 new_map <- inner_join(new_map, us_map, by = "ID")
 m <- st_as_sf(new_map)
 
+# Extract Unique Elements
+cat_choices <- unique(m$main_category)
+
 ############
 #    ui    #
 ############
-
-cat_choices <- unique(m$main_category)
 
 ui <- navbarPage(
   title = "Kickstarter",
@@ -50,7 +51,7 @@ ui <- navbarPage(
       ),
       
       mainPanel(
-        plotOutput(outputId = "map") 
+        plotlyOutput(outputId = "map") 
         
       ) 
     )
@@ -58,21 +59,24 @@ ui <- navbarPage(
 )
 
 server <- function(input, output) {
-  output$map <- renderPlot({
+  output$map <- renderPlotly({
     new_map <- m %>%
       filter(main_category == input$widget) 
     
-    ggplot(new_map) + geom_sf(aes(fill = success_rate)) + 
+    ggplot(new_map, aes(text = paste("State:", state,
+                                     "</br>Observations:", observations))) + 
+      geom_sf(aes(fill = success_rate)) + 
       # make a plain theme
-      theme(axis.line = element_blank(),axis.text.x = element_blank(),
-            axis.text.y = element_blank(),axis.ticks = element_blank(),
-            axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            panel.background = element_blank(),panel.border = element_blank(),panel.grid.major=element_blank(),
-            panel.grid.minor = element_blank(),plot.background = element_blank()) 
+      theme(axis.line = element_blank(), axis.text.x = element_blank(),
+            axis.text.y = element_blank(), axis.ticks = element_blank(),
+            axis.title.x = element_blank(), axis.title.y = element_blank(),
+            panel.background = element_blank(), panel.border = element_blank(), 
+            panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            plot.background = element_blank()) +
+      labs(title = paste("Success Rate for", input$widget, "Kickstarters in Each State"),
+           fill = "Success Rate")
     
   })
-  
 }
 
 

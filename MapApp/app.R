@@ -7,6 +7,8 @@ library(plotly)
 library(leaflet)
 library(sf)
 library(RColorBrewer)
+library(shinyWidgets)
+library(bslib)
 
 # import data
 kickstarter <- read.csv("map_tbl.csv")
@@ -33,17 +35,31 @@ cat_choices <- unique(m$main_category)
 m <- m %>%
   mutate(`Success Rate` = success_rate)
 
+title <- tags$a(href = "https://www.kickstarter.com/",
+                tags$image(src = "kickstarter.jpg", height = '22', width = '200'))
+
 ############
 #    ui    #
 ############
 
 ui <- navbarPage(
-  title = "Kickstarter",
+  theme = bs_theme(bootswatch = "minty",
+                   primary = "#05ce78",
+                   secondary = "#05ce78"),
+  tags$head(
+    tags$style(HTML("
+
+      .selectize-input {
+        height: 20px;
+        width: 200px;
+        font-size: 15pt;
+        padding-top: 5px;
+      }"))
+  ),
   
   tabPanel(
-    
-    title = "Chloropleth Map",
-    
+    title = title,
+   sidebarLayout(  
     sidebarPanel(
       
       selectInput(
@@ -51,14 +67,14 @@ ui <- navbarPage(
         label = "Choose Main Category",
         multiple = FALSE,
         choices = cat_choices,
-        selected = "All"
+        selected = "All"),
       ),
       
       mainPanel(
-        plotlyOutput(outputId = "map") 
-        
-      ) 
-    )
+        plotlyOutput(outputId = "map", 
+                     width = 650, height = 650))
+    
+   )
   )
 )
 
@@ -69,17 +85,22 @@ server <- function(input, output) {
     
     ggplot(new_map, aes(text = paste("State:", state,
                                      "</br>Observations:", observations))) + 
-      geom_sf(aes(fill = `Success Rate`)) + 
+      geom_sf(aes(fill = `Success Rate`)) +
       # make a plain theme
       theme(axis.line = element_blank(), axis.text.x = element_blank(),
             axis.text.y = element_blank(), axis.ticks = element_blank(),
             axis.title.x = element_blank(), axis.title.y = element_blank(),
             panel.background = element_blank(), panel.border = element_blank(), 
             panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-            plot.background = element_blank()) +
+            plot.background = element_blank(), plot.title = element_text(size = 20,
+                                                                         face = "bold",
+                                                                         family = "frankfurter",
+                                                                         color = "#05ce78",
+                                                                         hjust = 0,
+                                                                         vjust = 0)) +
       labs(title = paste("Success Rate for", input$widget, "Kickstarters in Each State"),
            fill = "Success Rate") +
-      scale_fill_distiller(palette = "Blues", direction = 1)
+      scale_fill_distiller(direction = 1)
     
   })
 }

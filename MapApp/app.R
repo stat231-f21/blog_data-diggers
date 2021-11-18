@@ -2,11 +2,8 @@
 ## loading packages
 library(tidyverse)
 library(shiny)
-library(maps)
 library(plotly)
-library(leaflet)
 library(sf)
-library(RColorBrewer)
 library(shinyWidgets)
 library(bslib)
 
@@ -15,7 +12,9 @@ kickstarter <- read.csv("map_tbl.csv")
 
 # remove the state "all"
 kickstarter <- kickstarter %>% 
-  filter(state != "All")
+  filter(state != "All") %>% 
+  mutate(success_rate = round(success_rate, 4))
+  
 
 us_map <- maps::map("state", plot = FALSE, fill = TRUE) %>%
   st_as_sf()

@@ -15,11 +15,8 @@ kickstarter <- kickstarter %>%
   filter(state != "All") %>% 
   mutate(success_rate = round(success_rate, 4))
   
-
 us_map <- maps::map("state", plot = FALSE, fill = TRUE) %>%
   st_as_sf()
-
-data(state)
 state_info <- data.frame(ID = tolower(state.name),
                          state = state.name)
 
@@ -47,7 +44,6 @@ ui <- navbarPage(
                    secondary = "#05ce78"),
   tags$head(
     tags$style(HTML("
-
       .selectize-input {
         height: 20px;
         width: 200px;

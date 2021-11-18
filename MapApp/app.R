@@ -86,6 +86,8 @@ server <- function(input, output) {
     ggplot(new_map, aes(text = paste("State:", state,
                                      "</br>Observations:", observations))) + 
       geom_sf(aes(fill = `Success Rate`)) +
+      labs(title = paste("Success Rate for", input$widget, "Kickstarters\nin Each State"),
+           fill = "Success Rate") +
       # make a plain theme
       theme(axis.line = element_blank(), axis.text.x = element_blank(),
             axis.text.y = element_blank(), axis.ticks = element_blank(),
@@ -94,13 +96,11 @@ server <- function(input, output) {
             panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
             plot.background = element_blank(), plot.title = element_text(size = 20,
                                                                          face = "bold",
-                                                                         family = "frankfurter",
-                                                                         color = "#05ce78",
-                                                                         hjust = 0,
-                                                                         vjust = 0)) +
-      labs(title = paste("Success Rate for", input$widget, "Kickstarters in Each State"),
-           fill = "Success Rate") +
-      scale_fill_distiller(direction = 1)
+                                                                         hjust = 0.5),
+            legend.title = element_text(family = "Frankurter",
+                                        size = 13,
+                                        face = "bold")) +
+      scale_fill_distiller(palette = "Greens", direction = 1)
     
   })
 }

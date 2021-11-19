@@ -1,0 +1,40 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(shiny)
+library(wordcloud)
+library(tidytext)
+library(tm)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# import data 
+kickstarter <- read.csv("kickstarter_2020.csv")
+# wrangle
+text <- kickstarter %>%
+  select(blurb, name, outcome, main_category)
+
+small_data <- kickstarter %>%
+  select(blurb, name)
+# filter for stop words 
+data(stop_words)
+wordcloud_data <- text %>%
+   unnest_tokens(output = word, input = blurb) %>%
+   anti_join(stop_words, by = "word")
+
+new_text <- inner_join(wordcloud_data, small_data, by = "name")
+
+# creating wordcloud 
+set.seed(189)
+new_text <- new_text %>%
+    with(wordcloud(words = word, max.words = 20))
+
+```
+

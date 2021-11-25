@@ -23,6 +23,7 @@ wordcloud_data <- text %>%
 new_text <- inner_join(wordcloud_data, small_data, by = "name")
 
 main_cat <- unique(new_text$main_category)
+cat_outcome <- unique(new_text$outcome)
 
 ############
 #    ui    #
@@ -31,10 +32,8 @@ ui <- fluidPage(
   theme = bs_theme(bootswatch = "minty",
                    primary = "#05ce78",
                    secondary = "#05ce78"), 
-  sidebarLayout(
-    
+
     sidebarPanel(
-      
       selectInput(
         inputId = "cloudchoice",
         label = "Choose a Category",
@@ -47,18 +46,29 @@ ui <- fluidPage(
         plotOutput("wordcloud")
       )
     )
-  )
 )  
 ############
 #  server  #
 ############
 # Define server logic required to make table
 server <- function(input, output) {
-  
-  
-  
-  
-  
+  output$wordcloud <- renderPlot({
+    # creating wordcloud for successful
+    set.seed(189)
+    successful_text <- new_text %>%
+      filter(main_category %in% input$cloudchoice) %>%
+      filter(cat_outcome == "successful") %>%
+      with(wordcloud(words = word, max.words = 20))
+    
+    # creating wordcloud for failed 
+    set.seed(342)
+    failed_text <- new_text %>%
+      filter(main_category %in% input$cloudchoice) %>%
+      filter(cat_outcome == "failed") %>%
+      with(wordcloud(words = word, max.words = 20))
+    
+    
+  })
 }
   
 

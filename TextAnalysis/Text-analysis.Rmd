@@ -31,10 +31,20 @@ wordcloud_data <- text %>%
 
 new_text <- inner_join(wordcloud_data, small_data, by = "name")
 
-# creating wordcloud 
+# creating wordcloud for successful
 set.seed(189)
-new_text <- new_text %>%
+successful_text <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "successful") %>%
     with(wordcloud(words = word, max.words = 20))
+
+# creating wordcloud for failed 
+set.seed(342)
+failed_text <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "failed") %>%
+    with(wordcloud(words = word, max.words = 20))
+
 
 ```
 

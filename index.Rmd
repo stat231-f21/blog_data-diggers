@@ -1,12 +1,20 @@
 ---
-title: "Kickstarter Analysis"
+title: | 
+  [![kickstarter](kickstarter.jpg){width=2in}](https://www.kickstarter.com/?ref=nav)
 author: "Dan and Karla"
 date: "November 30, 2021"
 output:
-  rmdformats::readthedown:
+  rmdformats::robobook:
     thumbnails: false
     highlight: "kate"
 ---
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"kickstarter.jpg\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
 
 ```{r setup, include = FALSE}
 library(tidyverse)
@@ -81,7 +89,8 @@ You can include [links](https://www.datadreaming.org/post/r-markdown-theme-galle
 
 ### Option 1: Markdown approach
 
-![This is a figure caption. The artwork is called Safe Space by  [Kenesha Sneed](https://www.keneshasneed.com/#/safespace/)](img/Kenesha-Sneed_safe-space.jpeg)
+![This is a figure caption. The artwork is called Safe Space by  [Kenesha Sneed](https://www.keneshasneed.com/#/safespace/)]
+<!-- (img/Kenesha-Sneed_safe-space.jpeg) -->
 
 
 ### Option 2: Code chunk approach

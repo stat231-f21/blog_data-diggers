@@ -1,7 +1,7 @@
 ---
-title: "Your Project Title Here"
-author: "Your Names Here"
-date: "Add a date"
+title: "Kickstarter Analysis"
+author: "Dan and Karla"
+date: "November 30, 2021"
 output:
   rmdformats::readthedown:
     thumbnails: false

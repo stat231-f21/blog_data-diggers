@@ -1,7 +1,7 @@
 # Repository for Data Diggers Blog
 
 
-<img src="https://media.gq.com/photos/59f0aa1cf964810d9a9b8f23/master/pass/1025-KickStarterMenswear_16x9.gif" title="Kickstarter gif" width="60%"/>
+<img src="https://media.gq.com/photos/59f0aa1cf964810d9a9b8f23/master/pass/1025-KickStarterMenswear_16x9.gif" title="Kickstarter gif" width="80%"/>
 
 
 # Checkpoint reminders

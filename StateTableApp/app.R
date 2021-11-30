@@ -13,6 +13,9 @@ state_choices <- unique(success_tbl$state)
 #    ui    #
 ############
 ui <- fluidPage(
+    theme = bs_theme(bootswatch = "minty",
+                     primary = "#05ce78",
+                     secondary = "#05ce78"),
     
     # Application title
     titlePanel("Success Rates by Category"),

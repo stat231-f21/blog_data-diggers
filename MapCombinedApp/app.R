@@ -1,4 +1,3 @@
-library(shiny)
 library(DT)
 library(tidyverse)
 library(miniUI)
@@ -34,8 +33,8 @@ cat_choices <- unique(m$main_category)
 # fix name
 m <- m %>%
     mutate(`Success Rate` = success_rate)
-title <- tags$a(href = "https://www.kickstarter.com/",
-                tags$image(src = "kickstarter.jpg", height = '22', width = '200'))
+# title <- tags$a(href = "https://www.kickstarter.com/",
+#                 tags$image(src = "kickstarter.jpg", height = '22', width = '200'))
 
 ############
 #    ui    #
@@ -147,4 +146,4 @@ server <- function(input, output) {
 # call to shinyApp #
 ####################
 # Run the application 
-runGadget(ui, server)
+shinyApp(ui, server)

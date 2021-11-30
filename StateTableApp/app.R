@@ -1,6 +1,6 @@
-library(shiny)
 library(DT)
 library(tidyverse)
+library(bslib)
 
 # DAN - import data
 success_tbl <- read.csv("success_rate_tbl.csv")

@@ -3,6 +3,8 @@ library(DT)
 library(tidyverse)
 library(miniUI)
 library(bslib)
+library(sf)
+library(plotly)
 
 # TABLE
 # TABLE - import data

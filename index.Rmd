@@ -32,6 +32,11 @@ options(knitr.kable.NA = '')
 
 # Header 1 (Section heading)
 
+```{r out.extra="data-external = 1"}
+knitr::include_app("https://ddachille23.shinyapps.io/MapGadgetApp/", height = "600px")
+```
+
+
 ## Header 2 (Subsection heading)
 
 ### Header 3 (Subsubsection heading)

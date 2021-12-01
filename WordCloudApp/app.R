@@ -28,7 +28,7 @@ ui <- fluidPage(
                wellPanel(
             selectInput(
                 inputId = "cat_choice",
-                label = "Choose Main Category",
+                label = "Main Category",
                 multiple = FALSE,
                 choices = cat_choices,
                 selected = "Art"))

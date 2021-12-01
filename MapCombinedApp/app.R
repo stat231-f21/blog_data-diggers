@@ -45,8 +45,8 @@ ui <- miniPage(
     theme = bs_theme(bootswatch = "minty",
                      primary = "#05ce78",
                      secondary = "#05ce78"),
-    # Application title
-    gadgetTitleBar("Success Rates by State", left = NULL, right = NULL),
+    # Application title - don't include for the blog
+    #gadgetTitleBar("Success Rates by State", left = NULL, right = NULL),
     
     # Sidebar with a slider input for number of bins 
     miniTabstripPanel(
@@ -69,7 +69,7 @@ ui <- miniPage(
                      sidebarPanel(
                          selectInput(
                              inputId = "widget",
-                             label = "Choose Main Category",
+                             label = "Main Category",
                              multiple = FALSE,
                              choices = cat_choices,
                              selected = "All"),

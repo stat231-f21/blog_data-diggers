@@ -9,12 +9,6 @@ output:
     highlight: "kate"
 ---
 
-<script>
-   $(document).ready(function() {
-     $head = $('#header');
-     $head.prepend('<img src=\"kickstarter.jpg\" style=\"float: right;width: 150px;\"/>')
-   });
-</script>
 
 ```{r setup, include = FALSE}
 library(tidyverse)

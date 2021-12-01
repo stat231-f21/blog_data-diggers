@@ -23,18 +23,19 @@ ui <- fluidPage(
                      secondary = "#05ce78"),
 
     # choice input selector
-    sidebarLayout(
-        sidebarPanel(
+    fluidRow(
+        column(5,
+               wellPanel(
             selectInput(
                 inputId = "cat_choice",
                 label = "Choose Main Category",
                 multiple = FALSE,
                 choices = cat_choices,
-                selected = "Art")
+                selected = "Art"))
         ),
 
         # Show the word cloud
-        mainPanel(
+        column(8,
            plotOutput("wordCloud")
         )
     )

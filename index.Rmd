@@ -24,14 +24,17 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = '')
 ```
 
-# Header 1 (Section heading)
+# Success by State and Cateogory
 
 <!--- iframe allows for more customization than include_app(), doesn't cut off edges -->
 <iframe src="https://ddachille23.shinyapps.io/MapGadgetApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
 
-## Header 2 (Subsection heading)
+# Blurb Text Analysis
+
+<iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
+
 
 ### Header 3 (Subsubsection heading)
 

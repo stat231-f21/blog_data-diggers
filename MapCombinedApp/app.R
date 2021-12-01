@@ -5,6 +5,8 @@ library(bslib)
 library(sf)
 library(plotly)
 
+# Map Shiny Gadget - Dan and Karla
+
 # TABLE
 # TABLE - import data
 success_tbl <- read.csv("success_rate_tbl.csv")
@@ -49,36 +51,34 @@ ui <- miniPage(
     # Sidebar with a slider input for number of bins 
     miniTabstripPanel(
         miniTabPanel("Table", icon = icon("table"),
-        sidebarPanel(
-            selectizeInput(inputId = "state",
-                           label = "State",
-                           choices = state_choices,
-                           selected = "All",
-                           multiple = FALSE),
+                     sidebarPanel(
+                         selectizeInput(inputId = "state",
+                                        label = "State",
+                                        choices = state_choices,
+                                        selected = "All",
+                                        multiple = FALSE),
+                     ),
+                     
+                     # data table
+                     miniContentPanel(DT::dataTableOutput(outputId = "table")
+                     )
         ),
         
-        # data table
-        miniContentPanel(DT::dataTableOutput(outputId = "table")
-        )
-    ),
-
-# MAP
+        # MAP
         miniTabPanel("Map", icon = icon("map-o"),
-        sidebarPanel(
-            selectInput(
-                inputId = "widget",
-                label = "Choose Main Category",
-                multiple = FALSE,
-                choices = cat_choices,
-                selected = "All"),
-        ),
-        
-        miniContentPanel(
-            plotlyOutput(outputId = "map", 
-                         width = 650, height = 650))
-        
+                     sidebarPanel(
+                         selectInput(
+                             inputId = "widget",
+                             label = "Choose Main Category",
+                             multiple = FALSE,
+                             choices = cat_choices,
+                             selected = "All"),
+                     ),
+                     miniContentPanel(
+                         plotlyOutput(outputId = "map", 
+                                      width = 650, height = 650))
+        )
     )
-)
 )
 
 
@@ -108,10 +108,7 @@ server <- function(input, output) {
     output$table <- DT::renderDataTable({
         datatable(data_for_table(), escape = FALSE, # escape = FALSE allows links to be clickable
                   extensions = c("Buttons"), 
-                  options = list(dom = 'Blrtip',
-                                 buttons = c('csv', 'excel', 'print'),
-                                 pageLength = 5,
-                                 lengthMenu = c(5, 10, 15)))
+                  options = list(dom = 't'))
     })
     
     # MAP
@@ -120,7 +117,7 @@ server <- function(input, output) {
             filter(main_category == input$widget) 
         
         gg <- ggplot(new_map, aes(text = paste("State:", state,
-                                         "</br>Observations:", observations))) + 
+                                               "</br>Observations:", observations))) + 
             geom_sf(aes(fill = `Success Rate`)) +
             ggtitle(paste("Success Rate for", input$widget, "Kickstarters\nin Each State")) +
             labs(fill = "Success Rate") +

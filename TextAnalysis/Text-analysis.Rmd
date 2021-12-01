@@ -83,10 +83,6 @@ tech %>%
   acast(word ~outcome, value.var = "n", fill = 0) %>% 
   comparison.cloud(colors = c("blue", "red"), max.words = 100)
 
-art %>% 
-  count(word, outcome, sort = T) %>% 
-  acast(word ~ outcome, value.var = "n", fill = 0) %>% 
-  comparison.cloud(colors = c("red", "blue"), max.words = 100)
 
 food %>% 
   count(word, outcome, sort = T) %>% 

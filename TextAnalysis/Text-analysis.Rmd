@@ -9,7 +9,11 @@ library(shiny)
 library(wordcloud)
 library(tidytext)
 library(tm)
-
+library(gridExtra)
+library(gridGraphics)
+library(ggwordcloud)
+library(tm)
+library(reshape2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -23,7 +27,8 @@ text <- kickstarter %>%
 
 small_data <- kickstarter %>%
   select(blurb, name)
-# filter for stop words 
+
+# remove stop words 
 data(stop_words)
 wordcloud_data <- text %>%
    unnest_tokens(output = word, input = blurb) %>%
@@ -31,20 +36,96 @@ wordcloud_data <- text %>%
 
 new_text <- inner_join(wordcloud_data, small_data, by = "name")
 
-# creating wordcloud for successful
-set.seed(189)
-successful_text <- new_text %>%
-    filter(main_category == "Technology") %>%
-    filter(outcome == "successful") %>%
-    with(wordcloud(words = word, max.words = 20))
-
-# creating wordcloud for failed 
-set.seed(342)
-failed_text <- new_text %>%
-    filter(main_category == "Technology") %>%
-    filter(outcome == "failed") %>%
-    with(wordcloud(words = word, max.words = 20))
 
 
 ```
+
+```{r}
+# side by side word cloud
+par(mfrow=c(1,2), xpd=NA)
+# creating wordcloud for successful
+set.seed(189) # reproducible randomness
+successful_text <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "successful")
+  
+wordcloud(words = successful_text$word, max.words = 40, colors = c("lightsteelblue1","lightsteelblue2","lightsteelblue3","lightsteelblue"))
+
+# creating wordcloud for failed 
+failed_text <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "failed") 
+wordcloud(words = failed_text$word, max.words = 30, color = c("indianred1","indianred2","indianred3","indianred"))
+
+```
+
+
+```{r}
+# WORKING COMPARISON CLOUD!!!!!!!
+tech <- new_text %>% 
+  filter(main_category == "Technology")
+
+art <- new_text %>% 
+  filter(main_category == "Art")
+
+food <- new_text %>% 
+  filter(main_category == "Food")
+
+tech %>% 
+  count(word, outcome, sort = T) %>% 
+  acast(word ~outcome, value.var = "n", fill = 0) %>% 
+  comparison.cloud(colors = c("blue", "red"), max.words = 100)
+
+art %>% 
+  count(word, outcome, sort = T) %>% 
+  acast(word ~ outcome, value.var = "n", fill = 0) %>% 
+  comparison.cloud(colors = c("red", "blue"), max.words = 100)
+
+food %>% 
+  count(word, outcome, sort = T) %>% 
+  acast(word ~ outcome, value.var = "n", fill = 0) %>% 
+  comparison.cloud(colors = c("red", "blue"), max.words = 100)
+
+
+
+```
+
+
+
+
+
+```{r}
+# comparison cloud - failed attempt
+
+dfAll <- new_text %>%
+    filter(main_category == "Technology") 
+docAll <- dfAll$word
+
+df1 <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "successful")
+doc1 <- df1$word
+
+df2 <- new_text %>%
+    filter(main_category == "Technology") %>%
+    filter(outcome == "failed")
+doc2 <- df2$word
+
+corpus_all <- 
+
+my_corpus <- VCorpus(VectorSource(doc1))
+my_corpus2 <- VCorpus(VectorSource(doc2))
+
+tdm <- TermDocumentMatrix(my_corpus)
+
+
+c<- VCorpus(VectorSource(kickstarter$blurb))
+data =tm_map(c, removeWords, stopwords("english"))
+TermDocumentMatrix(data)
+
+```
+
+
+
+
 

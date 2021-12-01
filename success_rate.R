@@ -1,4 +1,4 @@
-# TODO: ADD "ALL" column to the table 
+# Wranling R script for success rate - DAN
 library(tidyverse)
 
 kickstarter_data <- read.csv("kickstarter_2020.csv")

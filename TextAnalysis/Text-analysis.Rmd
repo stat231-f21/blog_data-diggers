@@ -71,6 +71,13 @@ art <- new_text %>%
 food <- new_text %>% 
   filter(main_category == "Food")
 
+fashion <-  new_text %>% 
+  filter(main_category == "Fashion")
+
+comics <- new_text %>% 
+  filter(main_category == "Comics")
+
+
 tech %>% 
   count(word, outcome, sort = T) %>% 
   acast(word ~outcome, value.var = "n", fill = 0) %>% 
@@ -86,6 +93,15 @@ food %>%
   acast(word ~ outcome, value.var = "n", fill = 0) %>% 
   comparison.cloud(colors = c("red", "blue"), max.words = 100)
 
+fashion %>% 
+  count(word, outcome, sort = T) %>% 
+  acast(word ~ outcome, value.var = "n", fill = 0) %>% 
+  comparison.cloud(colors = c("red", "blue"), max.words = 100)
+
+comics %>% 
+  count(word, outcome, sort = T) %>% 
+  acast(word ~ outcome, value.var = "n", fill = 0) %>% 
+  comparison.cloud(colors = c("#ed4752", "#05ce78"), max.words = 100)
 
 
 ```

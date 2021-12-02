@@ -15,10 +15,11 @@ library(maps)
 library(plotly)
 library(leaflet)
 library(sf)
+library(ggiraph)
 ```
 
 ```{r}
-kickstarter <- read.csv("success_rate_tbl.csv")
+kickstarter <- read.csv("MapCombinedApp/success_rate_tbl.csv")
 # remove the state "all"
 kickstarter <- kickstarter %>% 
   filter(state != "All")
@@ -38,16 +39,20 @@ new_map <- inner_join(new_map, us_map, by = "ID")
 
 new_map <- new_map %>% filter(main_category == "Food")
 
+new_map$success_rate <- round(new_map$success_rate, 4)
 m <- st_as_sf(new_map)
-map_static <- ggplot(m) + geom_sf(aes(fill = success_rate)) + 
+map_static <- ggplot(m) + geom_sf_interactive(aes(fill = success_rate, data_id = state, tooltip = paste("State: ", state, "</br>Success Rate: ", success_rate, "</br>Observations:", observations))) + 
   # make a plain theme
   theme(axis.line=element_blank(),axis.text.x=element_blank(),
           axis.text.y=element_blank(),axis.ticks=element_blank(),
           axis.title.x=element_blank(),
           axis.title.y=element_blank(),
           panel.background=element_blank(),panel.border=element_blank(),panel.grid.major=element_blank(),
-          panel.grid.minor=element_blank(),plot.background=element_blank()) 
+          panel.grid.minor=element_blank(),plot.background=element_blank()) +
+  scale_fill_distiller(palette = "Greens", direction = 1)
 # make interactive
+
+girafe(ggobj = map_static)
 ggplotly(map_static)
 ```
 

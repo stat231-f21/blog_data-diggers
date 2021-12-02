@@ -281,7 +281,7 @@ anim_save("line-plot.gif")
 
 ## Campaign Length and Success Rate {.tabset .tabset-fade .tabset-pills}
 
-From 2009-2011, Kickstarter creators were able to set campaign lengths of up to 90 days. However, in 2011, Kickstarter claimed that through their own research, they found that projects lasting longer than 60 days were less successful than projects with shorter campaign lengths, Thus, after 2011, campaign lengths were recommended to be at most 30-60 days. 
+From 2009-2011, Kickstarter creators were able to set campaign lengths of up to 90 days. However, in 2011, Kickstarter claimed that through their own research, they found that projects lasting longer than 60 days were less successful than projects with shorter campaign lengths, Thus, after 2011, campaign lengths were recommended to be at most 30-60 days (Strickler, 2011). 
 
 In this section, we analyze the validity of Kickstarter's findings: Do shorter campaign lengths correlate with higher success rates on Kickstarter projects? 
 

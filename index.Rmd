@@ -13,6 +13,7 @@ output:
 ```{r setup, include = FALSE}
 library(tidyverse)
 library(kableExtra) # for example code; delete if not needed
+library(tidytext)
 
 # Set code chunk defaults 
 knitr::opts_chunk$set(echo = FALSE, 
@@ -30,8 +31,154 @@ options(knitr.kable.NA = '')
 <iframe src="https://ddachille23.shinyapps.io/MapGadgetApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
+# Text Analysis 
 
-# Blurb Text Analysis
+## Text Length and Outcome {.tabset .tabset-fade .tabset-pills}
+
+```{r echo = FALSE}
+# read in data
+kickstarter <- read.csv("kickstarter_2020.csv")
+# wrangle
+text <- kickstarter %>%
+  select(blurb, name, outcome, main_category)
+
+small_data <- kickstarter %>%
+  select(blurb, name)
+
+# remove stop words 
+data(stop_words)
+wordcloud_data <- text %>%
+   unnest_tokens(output = word, input = blurb) %>%
+   anti_join(stop_words, by = "word")
+
+# join text
+new_text <- inner_join(wordcloud_data, small_data, by = "name")
+```
+
+### Name Length
+
+```{r echo = FALSE}
+# blurb length by outcome
+length_data <- text %>% 
+  mutate (blurb_length = nchar(blurb),
+          name_length = nchar(name))
+length_summary <- length_data %>% 
+  group_by(outcome) %>% 
+  summarise(mean_blurb_length = mean(blurb_length), n = n(),
+            mean_name_length = round(mean(name_length), 1)) %>% 
+  mutate(mean_blurb_length = round(mean_blurb_length, 1),
+         outcome = as.factor(outcome))
+# reorder levels of outcome factor
+length_summary$outcome <- factor(length_summary$outcome, levels=rev(levels(length_summary$outcome)))
+
+# name length plot
+ggplot(length_summary, aes(x = mean_name_length, y = outcome)) + 
+  geom_bar(stat = "identity", aes(fill = outcome)) +
+  theme_minimal() + labs(x = "Mean Name Length (characters)", y = "Outcome", title = "Name Length by Outcome") + 
+  geom_label(aes(label = mean_name_length)) +
+  scale_fill_manual(values=c("#05ce78", "#ed4752")) +
+  theme(legend.position = "none")
+```
+
+
+### Blurb Length
+
+```{r echo = FALSE}
+# blurb length plot
+ggplot(length_summary, aes(x = mean_blurb_length, y = outcome)) + 
+  geom_bar(stat = "identity", aes(fill = outcome)) +
+  theme_minimal() + labs(x = "Mean Blurb Length (characters)", y = "Outcome", title = "Blurb Length by Outcome") + 
+  geom_label(aes(label = mean_blurb_length)) +
+  scale_fill_manual(values=c("#05ce78", "#ed4752")) +
+  theme(legend.position = "none")
+
+```
+
+
+## Sentiment Analysis {.tabset .tabset-fade .tabset-pills}
+
+### Bing Lexicon
+
+```{r echo = FALSE, message = FALSE}
+# using bing lexicon (pos or neg)
+bing <- get_sentiments("bing")
+
+# join in bing and get blurb length
+blurb_sentiment <- new_text %>% 
+  inner_join(bing) 
+
+# creating sentiment score
+tt_bing <- blurb_sentiment %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
+            tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative"))
+# make table
+bing_tbl <- tt_bing %>% 
+  group_by(outcome) %>% 
+  summarise(mean_sent_score = mean(sentiment_score),
+            sd = sd(sentiment_score),
+            median = median(sentiment_score))
+bing_tbl_pretty <- bing_tbl %>% 
+  mutate(mean_sent_score = round(mean_sent_score, 3)) %>% 
+  select(outcome, mean_sent_score) %>% 
+  rename(Outcome = outcome, 
+         "Mean Sentiment Score" = mean_sent_score) %>% 
+  kbl() %>%
+  kable_material("hover")
+
+# sentiment score faceted plot
+ggplot(data = tt_bing, aes(x = sentiment_score, fill = outcome)) + 
+  geom_histogram(bins = 15) +
+  facet_grid(~outcome) + 
+  labs(title = "Sentiment Score by Outcome", x = "Sentiment Score (Bing lexicon)") + 
+  scale_fill_manual(values = c("#ed4752", "#05ce78")) +
+  theme_bw() +
+  theme(legend.position = "none") 
+bing_tbl_pretty
+```
+
+### Afinn Lexicon
+
+```{r echo = FALSE, message = FALSE}
+# using afinn lexicon
+afinn <- get_sentiments("afinn")
+
+blurb_sentiment_fin <- new_text %>% 
+  inner_join(afinn)
+
+# get sentiment score
+tt_afinn <- blurb_sentiment_fin %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(value))
+
+# make table
+afinn_tbl <- tt_afinn %>% 
+  group_by(outcome) %>% 
+  summarise(mean_sent_score = mean(sentiment_score),
+            sd = sd(sentiment_score),
+            median = median(sentiment_score)) 
+afinn_tbl_pretty <- afinn_tbl %>% 
+  mutate(mean_sent_score = round(mean_sent_score, 3)) %>% 
+  select(outcome, mean_sent_score) %>% 
+  rename(Outcome = outcome, 
+         "Mean Sentiment Score" = mean_sent_score) %>% 
+  kbl() %>%
+  kable_material("hover")
+
+
+# sentiment score faceted plot
+ggplot(data = tt_afinn, aes(x = sentiment_score, fill = outcome)) + 
+  geom_histogram(bins = 15) +
+  facet_grid(~outcome) + 
+  labs(title = "Sentiment Score by Outcome", x = "Sentiment Score (Afinn lexicon)") + 
+  scale_fill_manual(values = c("#ed4752", "#05ce78")) +
+  theme_bw() +
+  theme(legend.position = "none") 
+afinn_tbl_pretty
+```
+
+
+## Word Cloud
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 

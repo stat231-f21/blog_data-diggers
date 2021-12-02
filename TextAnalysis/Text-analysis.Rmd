@@ -115,13 +115,13 @@ blurb_sentiment <- new_text %>%
 blurb_sentiment %>% filter(name == "_DarkNet")
 
 
-# created sentiment score!!!!
+# creating sentiment score
 tt_bing <- blurb_sentiment %>% 
   group_by(name, outcome) %>% 
   summarize(sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
             tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative"))
 
-tt_bing %>% 
+bing_tbl <- tt_bing %>% 
   group_by(outcome) %>% 
   summarise(mean_sent_score = mean(sentiment_score),
             sd = sd(sentiment_score),

@@ -47,20 +47,18 @@ year_data <- date_data %>%
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n) 
 
-# dataset for campaign length
+# dataset for campaign length (2011)
 camplength1 <- date_data %>%
   group_by(campaign_length, year) %>%
   filter(year == 2011) %>%
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n) 
-
+# for 2012-2020
 camplength2 <- date_data %>%
   group_by(campaign_length, year) %>%
   filter(year > 2011, campaign_length <= 60) %>%
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n) 
-
-
 ```
 
 # Graphs
@@ -123,7 +121,7 @@ anim_save("line-plot.gif")
 ```
 
 ```{r}
-# line plot for campaign length 2009-2011
+# line plot for campaign length 2011
 ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
   geom_smooth(method = "glm") + geom_point() +
   labs(title = "Success of Kickstarter Projects Based off Campaign Length (2009-2011)",

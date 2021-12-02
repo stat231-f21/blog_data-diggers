@@ -32,7 +32,7 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = '')
 ```
 
-# Success by State and Cateogory
+# Success by State and Category
 
 <!--- iframe allows for more customization than include_app(), doesn't cut off edges -->
 <iframe src="https://ddachille23.shinyapps.io/MapGadgetApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>

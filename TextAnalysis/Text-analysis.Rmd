@@ -14,6 +14,7 @@ library(gridGraphics)
 library(ggwordcloud)
 library(tm)
 library(reshape2)
+library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -35,9 +36,6 @@ wordcloud_data <- text %>%
    anti_join(stop_words, by = "word")
 
 new_text <- inner_join(wordcloud_data, small_data, by = "name")
-
-
-
 ```
 
 ```{r}
@@ -60,7 +58,7 @@ wordcloud(words = failed_text$word, max.words = 30, color = c("indianred1","indi
 ```
 
 
-```{r}
+```{r word comparison cloud}
 # WORKING COMPARISON CLOUD!!!!!!!
 tech <- new_text %>% 
   filter(main_category == "Technology")
@@ -104,9 +102,144 @@ comics %>%
 
 
 
+# Sentiment Analysis
+
+```{r bing lexicon}
+# using bing lexicon (pos or neg)
+bing <- get_sentiments("bing")
+
+blurb_sentiment <- new_text %>% 
+  inner_join(bing) %>% 
+  mutate(blurb_length = nchar(blurb))
+
+blurb_sentiment %>% filter(name == "_DarkNet")
+
+
+# created sentiment score!!!!
+tt_bing <- blurb_sentiment %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
+            tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative"))
+
+tt_bing %>% 
+  group_by(outcome) %>% 
+  summarise(mean_sent_score = mean(sentiment_score),
+            sd = sd(sentiment_score),
+            median = median(sentiment_score))
+
+# sentiment score faceted plot
+ggplot(data = tt_bing, aes(x = sentiment_score, fill = outcome)) + 
+  geom_histogram(bins = 15) +
+  facet_grid(~outcome) + 
+  labs(title = "Sentiment Score by Outcome - Bing Lexicon", x = "Sentiment Score (Bing lexicon)") + 
+  scale_fill_manual(values = c("#ed4752", "#05ce78")) +
+  theme_bw() +
+  theme(legend.position = "none") 
+```
+
+
+```{r afinn lexicon}
+# using afinn lexicon
+afinn <- get_sentiments("afinn")
+
+blurb_sentiment_fin <- new_text %>% 
+  inner_join(afinn) %>% 
+  mutate(blurb_length = nchar(blurb))
+
+blurb_sentiment_fin %>% filter(name == "_DarkNet")
+
+
+# created sentiment score!!!!
+tt_afinn <- blurb_sentiment_fin %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(value))
+
+afinn_tbl <- tt_afinn %>% 
+  group_by(outcome) %>% 
+  summarise(mean_sent_score = mean(sentiment_score),
+            sd = sd(sentiment_score),
+            median = median(sentiment_score))
+
+
+# sentiment score faceted plot
+ggplot(data = tt_afinn, aes(x = sentiment_score, fill = outcome)) + 
+  geom_histogram(bins = 15) +
+  facet_grid(~outcome) + 
+  labs(title = "Sentiment Score by Outcome - Afinn Lexicon", x = "Sentiment Score (Afinn lexicon)") + 
+  scale_fill_manual(values = c("#ed4752", "#05ce78")) +
+  theme_bw() +
+  theme(legend.position = "none") 
+```
+
+
+
+
+
+
+
+
+
 
 
 ```{r}
+binary_afinn <- tt_afinn %>% 
+  mutate(outcome = ifelse(outcome == "successful", 1, 0))
+# logit model - not great
+library(pscl) # for McFadden R^2
+install.packages("pscl")
+pR2(model)
+logit <- glm(formula = outcome ~ sentiment_score, data = binary_afinn, family = "binomial")
+summary(logit)
+pR2(logit)
+```
+
+
+
+
+
+
+```{r length}
+# blurb length by outcome
+length_data <- text %>% 
+  mutate (blurb_length = nchar(blurb),
+          name_length = nchar(name))
+length_summary <- length_data %>% 
+  group_by(outcome) %>% 
+  summarise(mean_blurb_length = mean(blurb_length), n = n(),
+            mean_name_length = round(mean(name_length), 1)) %>% 
+  mutate(mean_blurb_length = round(mean_blurb_length, 1),
+         outcome = as.factor(outcome))
+# reorder levels of outcome factor
+length_summary$outcome <- factor(length_summary$outcome, levels=rev(levels(length_summary$outcome)))
+
+# blurb length plot
+ggplot(length_summary, aes(x = mean_blurb_length, y = outcome)) + 
+  geom_bar(stat = "identity", aes(fill = outcome)) +
+  theme_minimal() + labs(x = "Mean Blurb Length (characters)", y = "Outcome", title = "Blurb Length by Outcome") + 
+  geom_label(aes(label = mean_blurb_length)) +
+  scale_fill_manual(values=c("#05ce78", "#ed4752")) +
+  theme(legend.position = "none")
+
+
+# name length plot
+ggplot(length_summary, aes(x = mean_name_length, y = outcome)) + 
+  geom_bar(stat = "identity", aes(fill = outcome)) +
+  theme_minimal() + labs(x = "Mean Name Length (characters)", y = "Outcome", title = "Name Length by Outcome") + 
+  geom_label(aes(label = mean_name_length)) +
+  scale_fill_manual(values=c("#05ce78", "#ed4752")) +
+  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+
+
+
+```{r eval = F}
 # comparison cloud - failed attempt
 
 dfAll <- new_text %>%

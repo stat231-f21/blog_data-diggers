@@ -189,11 +189,9 @@ afinn_tbl_pretty
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
-# Title in Progress
+# Project Launch Analysis
 
-## Subtitle in Progress
-
-### Launch Month and Success Rate
+## Launch Month and Success Rate
 
 #### What is the best month to launch a project?
 
@@ -210,35 +208,20 @@ month_data <- date_data %>%
   group_by(month) %>%
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n)
-
-# creating plots
-p1 <- month_data %>%
-  filter(month == "January" | month == "February" | month == "March" | month == "May" |
-         month == "June" | month == "April") %>%
-  ggplot(aes(x = month, y = success_rate)) +
-  geom_bar(stat = "identity") + coord_flip() +
-  labs(#title = "Kickstarter Projects by Launch Month",
-       x = "Month",
-       y = "Success Rate") +
-  scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June"))) +
-  theme_minimal()
-
+# creating bar plot
 p2 <- month_data %>%
-  filter(month == "July" | month == "August" | month == "September" | month == "October" |
-         month == "November" | month == "December") %>%
   ggplot(aes(x = month, y = success_rate)) +
-  geom_bar(stat = "identity") + coord_flip() +
-  labs(#title = "Kickstarter Projects by Launch Month",
+  geom_bar(stat = "identity", fill = "#05ce78") + coord_flip() +
+  labs(title = "Kickstarter Projects by Launch Month", 
        x = "Month",
        y = "Success Rate") +
-  scale_x_discrete(limits = rev(c("July", "August", "September", "October", "November", "December"))) +
+  scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))) +
   theme_minimal()
-
-plot_grid(p1, p2) 
-
+p2
 ```
+![Kickstarter Projects by ]
 
-### Launch Day and Success Rate
+## Launch Day and Success Rate
 
 #### What is the best day to launch a project?
 
@@ -250,7 +233,7 @@ day_data <- date_data %>%
             success_rate = sum(outcome=="successful")/n) 
 # day barplot
 ggplot(data = day_data, aes(x = day, y = success_rate)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = "#05ce78") +
   labs(title = "Kickstarter Projects by Launch Day",
        x = "Day",
        y = "Success Rate") +
@@ -270,7 +253,7 @@ year_data <- date_data %>%
 
 # creating line plot for year 
 gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
-  geom_line() + geom_point() +
+  geom_line(color = "#05ce78") + geom_point() +
   labs(title = "Trend in Outcome of Kickstarter Projects by Year",
        x = "Year",
        y = "Success Rate") +
@@ -295,17 +278,11 @@ camplength1 <- date_data %>%
   filter(year == 2011) %>%
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n) 
-# for 2012-2020
-camplength2 <- date_data %>%
-  group_by(campaign_length, year) %>%
-  filter(year > 2011, campaign_length <= 60) %>%
-  summarise(n = n(),
-            success_rate = sum(outcome=="successful")/n) 
 
 # plot for campaign length 2011
 ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
-  geom_smooth(method = "lm") + geom_point() +
-  labs(title = "Success of Kickstarter Projects Based off Campaign Length (2009-2011)",
+  geom_smooth(method = "glm", color = "#05ce78") + geom_point() +
+  labs(title = "Success of Kickstarter Projects from Campaign Length (2009-2011)",
        x = "Campaign Length (in days)",
        y = "Success Rate") +
   theme_minimal()
@@ -314,10 +291,17 @@ ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
 ### 2012-2020
 
 ```{r, message = FALSE}
+# for 2012-2020
+camplength2 <- date_data %>%
+  group_by(campaign_length, year) %>%
+  filter(year > 2011, campaign_length <= 60) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+
 # plot for campaign length 2012-2020
 ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
-  geom_smooth(method = "glm") + geom_point() +
-  labs(title = "Success of Kickstarter Projects Based off Campaign Length (2011-2020)",
+  geom_smooth(method = "glm", color = "#05ce78") + geom_point() +
+  labs(title = "Success of Kickstarter Projects from Campaign Length (2011-2020)",
        x = "Campaign Length (in days)",
        y = "Success Rate") +
   facet_wrap(~ year) +

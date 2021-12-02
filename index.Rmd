@@ -32,6 +32,15 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = '')
 ```
 
+# Introduction
+
+## Kickstarter 
+
+Kickstarter, founded in 2009, is an online crowdfunding platform. Their mission is to help "bring creative projects to life" (Kickstarter, 2009) as individuals can create projects that draw others to support the process. 
+
+Source: Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about
+
+
 # Success by State and Category
 
 <!--- iframe allows for more customization than include_app(), doesn't cut off edges -->
@@ -189,6 +198,7 @@ afinn_tbl_pretty
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
+
 # Project Launch Analysis
 
 ## Launch Month and Success Rate
@@ -219,7 +229,7 @@ p2 <- month_data %>%
   theme_minimal()
 p2
 ```
-![Kickstarter Projects by ]
+
 
 ## Launch Day and Success Rate
 

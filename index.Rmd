@@ -14,6 +14,13 @@ output:
 library(tidyverse)
 library(kableExtra) # for example code; delete if not needed
 library(tidytext)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(plotly)
+library(gganimate)
+library(gifski)
+library(cowplot)
 
 # Set code chunk defaults 
 knitr::opts_chunk$set(echo = FALSE, 
@@ -182,8 +189,143 @@ afinn_tbl_pretty
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
+# Title in Progress
 
-### Header 3 (Subsubsection heading)
+## Subtitle in Progress
+
+### Launch Month and Success Rate
+
+#### What is the best month to launch a project?
+
+```{r}
+# wrangling
+date_data <- kickstarter %>%
+  select(c("launched_at", "outcome", "proportion_funded", "pct_funded", "campaign_length")) %>%
+  separate(launched_at, c("date", "time"), sep = " ") %>%
+  mutate(month = months(as.Date(date)),
+         day = weekdays(as.Date(date)),
+         year = year(as.Date(date))) 
+# dataset for month
+month_data <- date_data %>%
+  group_by(month) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n)
+
+# creating plots
+p1 <- month_data %>%
+  filter(month == "January" | month == "February" | month == "March" | month == "May" |
+         month == "June" | month == "April") %>%
+  ggplot(aes(x = month, y = success_rate)) +
+  geom_bar(stat = "identity") + coord_flip() +
+  labs(#title = "Kickstarter Projects by Launch Month",
+       x = "Month",
+       y = "Success Rate") +
+  scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June"))) +
+  theme_minimal()
+
+p2 <- month_data %>%
+  filter(month == "July" | month == "August" | month == "September" | month == "October" |
+         month == "November" | month == "December") %>%
+  ggplot(aes(x = month, y = success_rate)) +
+  geom_bar(stat = "identity") + coord_flip() +
+  labs(#title = "Kickstarter Projects by Launch Month",
+       x = "Month",
+       y = "Success Rate") +
+  scale_x_discrete(limits = rev(c("July", "August", "September", "October", "November", "December"))) +
+  theme_minimal()
+
+plot_grid(p1, p2) 
+
+```
+
+### Launch Day and Success Rate
+
+#### What is the best day to launch a project?
+
+```{r}
+#dataset for day
+day_data <- date_data %>%
+  group_by(day) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+# day barplot
+ggplot(data = day_data, aes(x = day, y = success_rate)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Kickstarter Projects by Launch Day",
+       x = "Day",
+       y = "Success Rate") +
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",
+                              "Thursday", "Friday", "Saturday")) +
+  theme_minimal()
+```
+
+## Trend in Success Rate 2009-2020
+
+```{r}
+# dataset for year
+year_data <- date_data %>%
+  group_by(year) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+
+# creating line plot for year 
+gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
+  geom_line() + geom_point() +
+  labs(title = "Trend in Outcome of Kickstarter Projects by Year",
+       x = "Year",
+       y = "Success Rate") +
+  transition_reveal(year) +
+  theme_minimal()
+
+# saving line plot into a gif
+animate(gif_plot_year, duration = 6, fps = 40, width = 400, height = 300, renderer = gifski_renderer())
+anim_save("line-plot.gif")
+
+```
+
+
+## Campaign Length and Success Rate {.tabset .tabset-fade .tabset-pills}
+
+### 2011
+
+```{r, message = FALSE}
+# dataset for campaign length (2011)
+camplength1 <- date_data %>%
+  group_by(campaign_length, year) %>%
+  filter(year == 2011) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+# for 2012-2020
+camplength2 <- date_data %>%
+  group_by(campaign_length, year) %>%
+  filter(year > 2011, campaign_length <= 60) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+
+# plot for campaign length 2011
+ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
+  geom_smooth(method = "lm") + geom_point() +
+  labs(title = "Success of Kickstarter Projects Based off Campaign Length (2009-2011)",
+       x = "Campaign Length (in days)",
+       y = "Success Rate") +
+  theme_minimal()
+```
+
+### 2012-2020
+
+```{r, message = FALSE}
+# plot for campaign length 2012-2020
+ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
+  geom_smooth(method = "glm") + geom_point() +
+  labs(title = "Success of Kickstarter Projects Based off Campaign Length (2011-2020)",
+       x = "Campaign Length (in days)",
+       y = "Success Rate") +
+  facet_wrap(~ year) +
+  theme_minimal()
+```
+
+
+## Header 3 (Subsubsection heading)
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For example, you can include **Bold** and _Italic_ and `Code` text.  For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 

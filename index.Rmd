@@ -326,6 +326,7 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
   scale_size_continuous(limits = c(1, 10000)) +
   facet_wrap(~ year) +
   theme_minimal() 
+
 ```
 
 

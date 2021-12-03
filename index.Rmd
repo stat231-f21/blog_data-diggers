@@ -12,7 +12,7 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
-library(kableExtra)
+library(kableExtra) # for example code; delete if not needed
 library(tidytext)
 library(tidyverse)
 library(ggplot2)
@@ -44,7 +44,7 @@ Source: Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about
 # Success by State and Category
 
 <!--- iframe allows for more customization than include_app(), doesn't cut off edges -->
-<iframe src="https://ddachille23.shinyapps.io/MapGadgetApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
+<iframe src="https://ddachille23.shinyapps.io/MapGadgetApp/" height="600" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
 # Text Analysis 
@@ -224,10 +224,11 @@ month_data <- date_data %>%
 p2 <- month_data %>%
   ggplot(aes(x = month, y = success_rate)) +
   geom_bar(stat = "identity", fill = "#05ce78") + coord_flip() +
-  labs(title = "Kickstarter Projects by Launch Month", 
+  labs(title = "Success Rate by Launch Month", 
        x = "Month",
        y = "Success Rate") +
   scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))) +
+  geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 p2
 ```
@@ -246,11 +247,12 @@ day_data <- date_data %>%
 # day barplot
 ggplot(data = day_data, aes(x = day, y = success_rate)) +
   geom_bar(stat = "identity", fill = "#05ce78") +
-  labs(title = "Kickstarter Projects by Launch Day",
+  labs(title = "Success Rate by Launch Day",
        x = "Day",
        y = "Success Rate") +
   scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",
                               "Thursday", "Friday", "Saturday")) +
+  geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 ```
 
@@ -301,8 +303,7 @@ ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
   labs(title = "Success of Kickstarter Projects by Campaign Length (2011)",
        x = "Campaign Length (in days)",
        y = "Success Rate",
-       size = "Successful Projects") + 
-  scale_size_continuous(limits = c(1, 1000)) +
+       size = "Number of Campaigns") +
   theme_minimal()
 ```
 
@@ -322,12 +323,8 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
   labs(title = "Success of Kickstarter Projects by Campaign Length (2011-2020)",
        x = "Campaign Length (in days)",
        y = "Success Rate",
-       size = "Successful Projects") +
-  scale_size_continuous(limits = c(1, 10000)) +
+       size = "Number of Campaigns") +
   facet_wrap(~ year) +
-  theme_minimal() 
-
+  theme_minimal()
 ```
-
-
 

@@ -12,7 +12,7 @@ output:
 
 ```{r setup, include = FALSE}
 library(tidyverse)
-library(kableExtra) # for example code; delete if not needed
+library(kableExtra)
 library(tidytext)
 library(tidyverse)
 library(ggplot2)
@@ -273,7 +273,7 @@ gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
   theme_minimal()
 
 # saving line plot into a gif
-animate(gif_plot_year, duration = 6, fps = 40, width = 400, height = 300, renderer = gifski_renderer())
+animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, renderer = gifski_renderer())
 anim_save("line-plot.gif")
 
 ```
@@ -300,7 +300,9 @@ ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
   geom_smooth(method = "glm", color = "#05ce78") + geom_point() +
   labs(title = "Success of Kickstarter Projects by Campaign Length (2011)",
        x = "Campaign Length (in days)",
-       y = "Success Rate") +
+       y = "Success Rate",
+       size = "Successful Projects") + 
+  scale_size_continuous(limits = c(1, 1000)) +
   theme_minimal()
 ```
 
@@ -319,9 +321,11 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
   geom_smooth(method = "glm", color = "#05ce78") + geom_point() +
   labs(title = "Success of Kickstarter Projects by Campaign Length (2011-2020)",
        x = "Campaign Length (in days)",
-       y = "Success Rate") +
+       y = "Success Rate",
+       size = "Successful Projects") +
+  scale_size_continuous(limits = c(1, 10000)) +
   facet_wrap(~ year) +
-  theme_minimal()
+  theme_minimal() 
 ```
 
 

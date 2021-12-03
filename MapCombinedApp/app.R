@@ -4,6 +4,7 @@ library(miniUI)
 library(bslib)
 library(sf)
 library(plotly)
+library(ggiraph)
 
 # Map Shiny Gadget - Dan and Karla
 
@@ -75,8 +76,8 @@ ui <- miniPage(
                              selected = "All"),
                      ),
                      miniContentPanel(
-                         plotlyOutput(outputId = "map", 
-                                      width = 650, height = 650))
+                         girafeOutput(outputId = "map", 
+                         ))
         )
     )
 )
@@ -108,17 +109,20 @@ server <- function(input, output) {
     output$table <- DT::renderDataTable({
         datatable(data_for_table(), escape = FALSE, # escape = FALSE allows links to be clickable
                   extensions = c("Buttons"), 
-                  options = list(dom = 't'))
+                  options = list(dom = 't',
+                                 pageLength = 14))
     })
     
     # MAP
-    output$map <- renderPlotly({
+    output$map <- renderGirafe({
         new_map <- m %>%
             filter(main_category == input$widget) 
-        
+        # round success rate
+        new_map$success_rate <- round(new_map$success_rate, 4)
+        # make ggplot
         gg <- ggplot(new_map, aes(text = paste("State:", state,
                                                "</br>Observations:", observations))) + 
-            geom_sf(aes(fill = `Success Rate`)) +
+            geom_sf_interactive(aes(fill = success_rate, data_id = state, tooltip = paste("State: ", state, "</br>Success Rate: ", success_rate, "</br>Observations:", observations))) +
             ggtitle(paste("Success Rate for", input$widget, "Kickstarters\nin Each State")) +
             labs(fill = "Success Rate") +
             # make a plain theme
@@ -127,16 +131,18 @@ server <- function(input, output) {
                   axis.title.x = element_blank(), axis.title.y = element_blank(),
                   panel.background = element_blank(), panel.border = element_blank(), 
                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                  plot.background = element_blank(), plot.title = element_text(size = 20,
+                  plot.background = element_blank(), plot.title = element_text(size = 15,
                                                                                face = "bold",
                                                                                hjust = 0.5),
                   legend.title = element_text(family = "Frankurter",
                                               size = 13,
                                               face = "bold")) +
             scale_fill_distiller(palette = "Greens", direction = 1)
-        ggplotly(gg) %>% layout(title = list(text = paste("Success Rate for", input$widget, "Kickstarters\nin Each State"), y = 0.8))
+        # make interactive
+        interactive_gg <- girafe(ggobj = gg) 
+        # add zooming functionality
+        interactive_gg <- girafe_options(interactive_gg, opts_zoom(min = 1, max = 2.5))
     })
-    
 }
 
 ####################

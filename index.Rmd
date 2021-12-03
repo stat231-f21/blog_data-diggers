@@ -228,6 +228,7 @@ p2 <- month_data %>%
        x = "Month",
        y = "Success Rate") +
   scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))) +
+  geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 p2
 ```
@@ -251,6 +252,7 @@ ggplot(data = day_data, aes(x = day, y = success_rate)) +
        y = "Success Rate") +
   scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",
                               "Thursday", "Friday", "Saturday")) +
+  geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 ```
 

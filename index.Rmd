@@ -224,7 +224,7 @@ month_data <- date_data %>%
 p2 <- month_data %>%
   ggplot(aes(x = month, y = success_rate)) +
   geom_bar(stat = "identity", fill = "#05ce78") + coord_flip() +
-  labs(title = "Kickstarter Projects by Launch Month", 
+  labs(title = "Success Rate by Launch Month", 
        x = "Month",
        y = "Success Rate") +
   scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))) +
@@ -247,7 +247,7 @@ day_data <- date_data %>%
 # day barplot
 ggplot(data = day_data, aes(x = day, y = success_rate)) +
   geom_bar(stat = "identity", fill = "#05ce78") +
-  labs(title = "Kickstarter Projects by Launch Day",
+  labs(title = "Success Rate by Launch Day",
        x = "Day",
        y = "Success Rate") +
   scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",

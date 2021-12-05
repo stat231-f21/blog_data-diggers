@@ -596,19 +596,19 @@ Precision(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive =
 Recall(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive = 1) # sensitivity
 ```
 
-$$Accuracy =  \frac{(TP + TN)}{(TP + TN + FP + FN)} = \frac{(24155 + 12860)}{(24155 + 12860 + 9376 + 4905)} = 0.7216$$
+$$Accuracy =  \frac{(TP + TN)}{(TP + TN + FP + FN)} = \frac{(24055 + 12808)}{(24055 + 12808 + 9477 + 4958)} = 0.7186$$
 
-The model is 72.16% accurate, meaning that it predicts the correct outcome 72.16% of the time.
+The model is 71.86% accurate, meaning that it predicts the correct outcome 71.86% of the time.
 
-$$Precision =  \frac{(TP)}{(TP + FP)} = \frac{(24155)}{(24155 + 9376)} = 0.7204$$
-
-
-The model's precision is 72.04%, meaning that 72.04% of the campaigns predicted to be successful were truly successful. In other words, when it predicts a campaign will be successful, it is correct 72.04% of the time.
-
-$$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24155)}{(24155 + 4905)} = 0.8312$$
+$$Precision =  \frac{(TP)}{(TP + FP)} = \frac{(24055)}{(24055 + 9477)} = 0.7174$$
 
 
-The model's recall is 83.12%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 83.12% of the time (true positive rate). In other words, it correctly identifies 83.12% of all successful campaigns. 
+The model's precision is 71.74%, meaning that 71.74% of the campaigns predicted to be successful were truly successful. In other words, when it predicts a campaign will be successful, it is correct 71.74% of the time.
+
+$$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24055)}{(24055 + 4958)} = 0.8291$$
+
+
+The model's recall is 82.91%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 82.91% of the time (true positive rate). In other words, it correctly identifies 82.91% of all successful campaigns. 
 
 
 

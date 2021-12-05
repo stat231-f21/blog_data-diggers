@@ -1,6 +1,7 @@
 ---
 title: | 
   [![kickstarter](kickstarter.jpg){width=2in}](https://www.kickstarter.com/?ref=nav)
+subtitle: "Analyzing and Modeling Kickstarter Data: What are the drivers of success for Kickstarter campaigns?"
 author: "Dan and Karla"
 date: "November 30, 2021"
 output:
@@ -38,8 +39,6 @@ options(knitr.kable.NA = '')
 ```
 
 # Introduction
-
-## Kickstarter 
 
 Kickstarter, founded in 2009, is an online crowdfunding platform. Their mission is to help "bring creative projects to life" (Kickstarter, 2009) as individuals can create projects that draw others to support the process. 
 
@@ -527,8 +526,11 @@ Using a Wald test for each predictor, all predictors are significant at an alpha
 lrtest(mod.full, mod.small)
 ```
 
-The nested LRT returns a significant p-value, meaning that the additional predictor, `main_cateogry`, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep `main_category` in our model and remove `launch_month` in the final model. The final model has the lowest AIC, so we will proceed with that model.
+The nested LRT returns a significant p-value, meaning that the additional predictor, `main_cateogry`, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep `main_category` in the final model. The final model has the lowest AIC, so we will proceed with that model.
 
+## Final Model Interpretation
+
+The predictor with the largest effect size is `staff_pick`. The indicator variable `staff_pickTRUE` has a coefficient of 2.61 with an extremely small p-value. An intercept of 2.61 means that the estimated odds of success for a campaign that is a staff pick is 13.6 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is `main_categoryComics`, with a coefficient of 1.49 and an extremely small p-value. An intercept of 1.49 means that the estimated odds of success for a comic book campaign is 4.44 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
 
 ## Model Evaluation
 

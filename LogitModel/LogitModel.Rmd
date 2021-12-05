@@ -1,0 +1,269 @@
+---
+title: "Kickstarter Logistic Regression"
+author: "Dan"
+date: "12/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(mltools)
+library(pscl)
+library(lubridate)
+library(data.table)
+library(caret)
+library(broom)
+library(ROCR)
+library(MLmetrics)
+library(Stat2Data)
+library(ggformula) # for gf_percets()
+library(lmtest) # lrt test
+library(kableExtra)
+library(gridExtra)
+library(gt) # to create a pretty conf matrix
+
+options(scipen = 999)
+set.seed(123)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r read data}
+# read csv (use ../ in order to go back outside the folder)
+kickstarter <- read.csv("../kickstarter_2020.csv")
+```
+
+## Prepare Data
+
+```{r prepare data}
+# cast categorical predictors into factors, mutate outcome into 0 = failed, 1 = successful
+kickstarter <- kickstarter %>% 
+  mutate(outcome = ifelse(outcome == "successful", 1, 0),
+         main_category = as.factor(main_category),
+         sub_category = as.factor(sub_category),
+         city = as.factor(city),
+         state = as.factor(state),
+         country_corrected = as.factor(country_corrected),
+         launched_at = date(launched_at))
+
+glimpse(kickstarter)
+
+# subset data to relevant variables
+kickstarter_subset <- kickstarter %>% 
+  select(backers_count, country_display_name_corrected, launched_at, spotlight, staff_pick, outcome, goal_usd, pledged_usd, campaign_length, main_category, sub_category, city, state, proportion_funded, name, blurb) %>% 
+  mutate(launch_month = month(launched_at),
+         launch_day = wday(launched_at),
+         name_length = str_length(name),
+         blurb_length = str_length(blurb))
+
+# split into training and testing - 70/30 split
+sample <- sample(c(TRUE, FALSE), nrow(kickstarter_subset), replace = T, prob = c(0.7,0.3))
+train <- kickstarter_subset[sample, ]
+test <- kickstarter_subset[!sample, ]
+
+glimpse(train)
+```
+
+## Predictors
+1) Goal (Quantitative, $): The chosen amount of money in USD a company needs to raise to have a successful campaign.
+2) Campaign length (Quantitative, Days): The chosen length of the campaign, ranging from 0-90 in 2009-2011, and 0-60 in 2012-2020
+3) Name length (Quantitative, Characters): The length of the startup's name.
+4) Staff pick (Categorical, TRUE/FALSE): Whether or not the project was selected by the staff at Kickstarter to be included in the "Projects we Love" section.
+5) Main Category (Categorical): The main category of the campaign. There are 14 main categories (Art, Comics, Crafts, ... etc.)
+6) Launch Day (Categorical): The day of the week in which the campaign was launched.
+7) Launch Month (Categorical): The month in which the campaign was launched.
+
+## Check Conditions for Logistic Regression 
+- Is `outcome` binary? Yes `outcome` is binary (success/fail)
+- Linearity: Checked for quantitative predictors below, automatic for categorical predictors
+- Independence of observations:  It is reasonable to assume that Kickstarter campaigns independent. 
+- Randomness: We know that we didn't capture all Kickstarter campaigns from 2009-2020, but the 170,000 scraped campaigns were selected randomly
+
+### Check Linearity of Quantitative Predictors and log-odds  
+
+```{r}
+# QUANT PREDICTOR 1 - GOAL
+emplogitplot1(outcome ~ goal_usd, data = train, ngroups = 15, xlab = "goal ($)", main = "Goal Empirical Logit Plot")
+
+# transform variable - for BOTH training and testing set
+train <- train %>% mutate(sqrt_goal_usd = sqrt(goal_usd))
+test <- test %>% mutate(sqrt_goal_usd = sqrt(goal_usd))
+
+emplogitplot1(outcome ~ sqrt_goal_usd, data = train, ngroups = 15, xlab = "sqrt(goal)", main = "Square Root Transformed Goal Empirical Logit Plot")
+
+# QUANT PREDICTOR 2 - NAME LENGTH
+emplogitplot1(outcome ~ name_length, data = train, ngroups = 15, xlab = "name length (characters)", main = "Name Length Empirical Logit Plot")
+
+# QUANT PREDICTOR 3 - CAMPAIGN LENGTH
+emplogitplot1(outcome ~ campaign_length, data = train, xlab = "campaign length (days)", ngroups = "all", main = "Campaign Length Emprical Logit Plot")
+
+grid.arrange(emplogitplot1(outcome ~ goal_usd, data = train, ngroups = 15, xlab = "goal ($)", main = "Goal Empirical Logit Plot"), emplogitplot1(outcome ~ sqrt_goal_usd, data = train, ngroups = 15, xlab = "sqrt(goal)", main = "Square Root Transformed Goal Empirical Logit Plot"))
+
+# Blurb Length (no relationship)
+#emplogitplot1(outcome ~ blurb_length, data = train, ngroups = 15, xlab = "name length (characters)", main = "Blurb Length Empirical Logit Plot")
+```
+`goal_usd` does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. The empirical logit plot for `campaign_length` looks concerning. 
+
+
+# EDA
+## Response Variable - Kickstarter Campaign Outcome
+
+```{r}
+outcome_summary_tbl <- train %>% group_by(outcome) %>% summarise(n = n()) %>% 
+  mutate(freq = round(n/sum(n), 4),
+         outcome = ifelse(outcome == 1, "Successful", "Failed")) %>% 
+  rename("Outcome" = outcome, "Number of Campaigns" = n, "Frequency of Campaigns" = freq)
+outcome_summary_tbl
+```
+
+56.9% of all Kickstarter campaigns in the training set were successful
+
+## EDA for Categorical Variables
+
+```{r}
+# staff pick
+gf_percents(~ staff_pick, fill = ~ as.factor(outcome), position = "fill", data = train, title = "Staff Pick Mosiac Plot", xlab = "Staff Pick", ylab = "Outcome Percent") +
+  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
+# launch day of week 
+gf_percents(~ factor(launch_day), fill = ~ as.factor(outcome), position = "fill", data = train, title = "Launch Weekday Mosiac Plot", xlab = "Launch Weekday", ylab = "Outcome Percent") + 
+  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
+# launch month
+gf_percents(~ factor(launch_month), fill = ~ as.factor(outcome), position = "fill", data = train, title = "Launch Month Mosiac Plot", xlab = "Launch Month", ylab = "Outcome Percent") + 
+  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
+# main category
+gf_percents(~ main_category, fill = ~ as.factor(outcome), position = "fill", data = train, title = "Main Category Mosiac Plot", xlab = "Main Category", ylab = "Outcome Percent") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
+```
+
+
+
+# Variable Selection
+
+```{r}
+# full model
+mod.full <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + staff_pick + launch_day + launch_month + main_category, data = train, family = "binomial")
+summary(mod.full)
+mod.small <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + staff_pick + launch_day + launch_month, data = train, family = "binomial")
+summary(mod.small)
+mod.final <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + staff_pick + launch_day + main_category, data = train, family = "binomial")
+summary(mod.final)
+
+```
+
+Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the `main_category` predictor. We will remove launch_month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the predictor `main_category` in our model, we will perform a nested likelihood ratio test (LRT).
+
+```{r}
+# nested LRT
+lrtest(mod.full, mod.small)
+```
+
+The nested LRT returns a significant p-value, meaning that the additional predictor, `main_cateogry`, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep `main_category` in our model and remove `launch_month` in the final model. The final model has the lowest AIC, so we will proceed with that model.
+
+
+# Model Evaluation
+
+```{r}
+# get predicted values
+test.predicted.mod.final <-  predict(mod.final, newdata = test, type = "response")
+table(test$outcome, test.predicted.mod.final > 0.5) %>% prop.table() %>% round(3)
+conf.matrix <- table(test$outcome, test.predicted.mod.final > 0.5)
+
+# make pretty confusion matrix
+pretty.conf.matrix <- as.data.frame(conf.matrix) %>% 
+  pivot_wider(names_from = Var2, values_from = Freq) %>% 
+  mutate(Var1 = as.character(Var1),
+         Var1 = ifelse(Var1 == "0", "True Failure", "True Success")) %>% 
+  gt() %>% 
+  cols_label(Var1 = " ", `FALSE` = "Predicted Failure", `TRUE` =  "Predicted Success") %>% 
+  tab_header(title = md("Confusion Matrix")) %>% 
+  tab_options(heading.title.font.size = 18) %>% 
+  tab_style(
+    style = list(
+      cell_fill(color = "#05ce78"),
+      cell_text(style = "italic")
+      ),
+    locations = cells_body(
+      columns = `FALSE`,
+      rows = 1
+    )
+  ) %>% 
+  tab_style(
+    style = list(
+      cell_fill(color = "#05ce78"),
+      cell_text(style = "italic")
+      ),
+    locations = cells_body(
+      columns = `TRUE`,
+      rows = 2
+    )
+  ) %>% 
+  tab_style(
+    style = list(
+      cell_fill(color = "#ed4752",
+                 alpha = 0.9)
+      ),
+    locations = cells_body(
+      columns = `FALSE`,
+      rows = 2
+    )
+  ) %>% 
+  tab_style(
+    style = list(
+      cell_fill(color = "#ed4752",
+                alpha = 0.9)
+      ),
+    locations = cells_body(
+      columns = `TRUE`,
+      rows = 1
+    )
+  )
+pretty.conf.matrix
+```
+
+```{r}
+Accuracy(ifelse(test.predicted.mod.final >= .5, 1, 0), test$outcome)
+Precision(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive = 1) # true pos rate
+Recall(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive = 1) # sensitivity
+```
+
+$$Accuracy =  \frac{(TP + TN)}{(TP + TN + FP + FN)} = \frac{(24096 + 12829)}{(24096 + 12829 + 9389 + 4929)} = 0.7206$$
+
+The model is 72.06% accurate, meaning that it predicts the correct outcome 72.06% of the time.
+
+$$Precision =  \frac{(TP)}{(TP + FP)} = \frac{(24096)}{(24096 + 9389)} = 0.7196$$
+
+
+The model's precision is 71.98%, meaning that 71.98% of the campaigns predicted to be successful were truly successful. In other words, when it predicts a campaign will be successful, it is correct 71.98% of the time.
+
+$$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24096)}{(24096 + 4929)} = 0.8302 $$
+
+
+The model's recall is 83.02%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 83.02% of the time (true positive rate). In other words, it correctly identifies 83.02% of all successful campaigns. 
+
+
+## Prediction
+```{r}
+# predict a companies success based on inputs
+tech <- tibble(main_category = "Technology", sqrt_goal_usd = sqrt(9), staff_pick = FALSE, campaign_length = 30, launch_day = 3, launch_month = 10, name_length = 30)
+
+ambitious_tech  <- tibble(main_category = "Technology", sqrt_goal_usd = sqrt(500000), staff_pick = FALSE, campaign_length = 30, launch_day = 3, launch_month = 10, name_length = 30)
+
+comic <- tibble(main_category = "Comics", sqrt_goal_usd = sqrt(50), staff_pick = TRUE, campaign_length = 30, launch_day = 3, launch_month = 10, name_length = 30)
+
+# find phat given the inputs - model probability of success
+predict(mod.final, tech, type = "response")
+predict(mod.final, ambitious_tech, type = "response")
+predict(mod.final, comic, type = "response")
+```
+
+
+
+
+
+
+
+
+
+
+
+

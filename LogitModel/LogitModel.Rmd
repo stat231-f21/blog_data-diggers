@@ -147,7 +147,6 @@ mod.small <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + staff
 summary(mod.small)
 mod.final <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + staff_pick + launch_day + main_category, data = train, family = "binomial")
 summary(mod.final)
-
 ```
 
 Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the `main_category` predictor. We will remove launch_month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the predictor `main_category` in our model, we will perform a nested likelihood ratio test (LRT).

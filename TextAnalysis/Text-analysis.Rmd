@@ -26,6 +26,7 @@ kickstarter <- read.csv("kickstarter_2020.csv")
 text <- kickstarter %>%
   select(blurb, name, outcome, main_category)
 
+
 small_data <- kickstarter %>%
   select(blurb, name)
 
@@ -35,6 +36,10 @@ wordcloud_data <- text %>%
    unnest_tokens(output = word, input = blurb) %>%
    anti_join(stop_words, by = "word")
 
+title_data <- text %>% 
+  unnest_tokens(output = word, input = name, drop = FALSE) %>%
+  anti_join(stop_words, by = "word")
+  
 new_text <- inner_join(wordcloud_data, small_data, by = "name")
 ```
 
@@ -102,7 +107,7 @@ comics %>%
 
 
 
-# Sentiment Analysis
+# Sentiment Analysis - Blurb
 
 ```{r bing lexicon}
 # using bing lexicon (pos or neg)
@@ -146,8 +151,6 @@ blurb_sentiment_fin <- new_text %>%
   inner_join(afinn) %>% 
   mutate(blurb_length = nchar(blurb))
 
-blurb_sentiment_fin %>% filter(name == "_DarkNet")
-
 
 # created sentiment score!!!!
 tt_afinn <- blurb_sentiment_fin %>% 
@@ -169,14 +172,35 @@ ggplot(data = tt_afinn, aes(x = sentiment_score, fill = outcome)) +
   scale_fill_manual(values = c("#ed4752", "#05ce78")) +
   theme_bw() +
   theme(legend.position = "none") 
+
+# boxplot
+ggplot(tt_afinn) + geom_boxplot(aes(x = sentiment_score, y = outcome))
 ```
 
 
+# Name Sentiment Analysis
 
+```{r}
+name_sentiment_fin <- title_data %>% 
+  inner_join(afinn)
 
+# sentiment score
+name_afinn_scores <- name_sentiment_fin %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(value))
 
+# sentiment score faceted plot
+ggplot(data = name_afinn_scores, aes(x = sentiment_score, fill = outcome)) + 
+  geom_histogram(bins = 15) +
+  facet_grid(~outcome) + 
+  labs(title = "Sentiment Score by Outcome - Afinn Lexicon", x = "Sentiment Score (Afinn lexicon)") + 
+  scale_fill_manual(values = c("#ed4752", "#05ce78")) +
+  theme_bw() +
+  theme(legend.position = "none") 
 
-
+# boxplot
+ggplot(name_afinn_scores) + geom_boxplot(aes(x = sentiment_score, y = outcome))
+```
 
 
 

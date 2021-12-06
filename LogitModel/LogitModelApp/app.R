@@ -141,7 +141,7 @@ server <- function(input, output) {
     goal_init <- input$input_goal
     goal_refined <- formatC(goal_init, format="d", big.mark=",")
     # make text for output
-    final_text <- paste0("There is a ", pred_pct, "% chance that ", input$input_name, " will reach their funding goal of $", goal_refined)
+    final_text <- paste0("There is a ", pred_pct, "% chance that ", input$input_name, " will reach its funding goal of $", goal_refined)
     # print text
     output$text <- renderText({
         final_text

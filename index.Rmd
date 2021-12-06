@@ -614,7 +614,7 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 # Prediction App
 
-<iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
+<iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="650" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
 

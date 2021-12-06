@@ -1,8 +1,9 @@
 # Logit Model App
 
 # libraries
-library(shiny)
 library(bslib)
+library(tidyverse)
+library(lubridate)
 
 # reproducible randomness
 set.seed(123)
@@ -10,7 +11,7 @@ set.seed(123)
 
 # I do some wrangling in the app to avoid committing another large csv file to the repo
 # read in csv
-kickstarter <- read.csv("../../kickstarter_2020.csv")
+kickstarter <- read.csv("kickstarter_2020.csv")
 
 # cast categorical predictors into factors, mutate outcome into 0 = failed, 1 = successful
 kickstarter_init <- kickstarter %>% 
@@ -56,12 +57,19 @@ ui <- fluidPage(
                      primary = "#05ce78",
                      secondary = "#05ce78"),
 
-    # Application title
-    titlePanel("Kickstarter Success Prediction"),
+    # Application title - not needed inside of blog
+    # titlePanel("Kickstarter Success Prediction"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
+            # style text
+            tags$head(tags$style("#text{
+                             font-size: 25px;
+                             padding-top:200px;
+                         }"
+            )
+            ),
             # category input
             selectizeInput(inputId = "input_cat",
                         label = "Category",

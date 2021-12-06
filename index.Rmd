@@ -612,6 +612,9 @@ $$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24055)}{(24055 + 4958)} = 0.8291$$
 
 The model's recall is 82.91%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 82.91% of the time (true positive rate). In other words, it correctly identifies 82.91% of all successful campaigns. 
 
+# Prediction App
+
+<iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="700" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
 

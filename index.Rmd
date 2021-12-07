@@ -276,11 +276,13 @@ gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
        x = "Year",
        y = "Success Rate") +
   transition_reveal(year) +
-  theme_minimal()
+  theme_minimal() + 
+  geom_text(aes(label = scales::percent(success_rate, accuracy = 1),
+                vjust = -2), show.legend = FALSE)
 
 # saving line plot into a gif
 animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, renderer = gifski_renderer())
-anim_save("line-plot.gif")
+#anim_save("line-plot.gif")
 
 ```
 

@@ -117,6 +117,21 @@ ggplot(length_summary, aes(x = mean_blurb_length, y = outcome)) +
 
 ## Sentiment Analysis {.tabset .tabset-fade .tabset-pills}
 
+```{r non-eval printed sentiment chunk, eval = FALSE, echo = TRUE}
+# get Bing sentiment scores
+bing_scores <- blurb_sentiment_bing %>% 
+  group_by(name, outcome) %>% 
+  summarize(
+    sentiment_score = sum(sentiment == "positive") - 
+      sum(sentiment == "negative")
+    )
+# get Afinn sentiment scores
+afinn_scores <- blurb_sentiment_fin %>% 
+  group_by(name, outcome) %>% 
+  summarize(sentiment_score = sum(value))
+```
+
+
 ### Bing Lexicon
 
 ```{r echo = FALSE, message = FALSE}
@@ -127,11 +142,13 @@ bing <- get_sentiments("bing")
 blurb_sentiment <- new_text %>% 
   inner_join(bing) 
 
-# creating sentiment score
+# creating bing sentiment score
 tt_bing <- blurb_sentiment %>% 
   group_by(name, outcome) %>% 
-  summarize(sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
-            tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative"))
+  summarize(
+    sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
+            tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative")
+    )
 # make table
 bing_tbl <- tt_bing %>% 
   group_by(outcome) %>% 
@@ -166,7 +183,7 @@ afinn <- get_sentiments("afinn")
 blurb_sentiment_fin <- new_text %>% 
   inner_join(afinn)
 
-# get sentiment score
+# get afinn sentiment score
 tt_afinn <- blurb_sentiment_fin %>% 
   group_by(name, outcome) %>% 
   summarize(sentiment_score = sum(value))
@@ -375,7 +392,7 @@ test <- kickstarter_subset[!sample, ]
 7) `launch_month` (Categorical): The month in which the campaign was launched.
 
 ## Conditions for Logistic Regression 
-- Is `outcome` binary? Yes `outcome` is binary (success/fail).
+- Is outcome binary? Yes outcome is binary since a Kickstarter campaign can either have a failed or successful outcome.
 - Linearity: Checked for quantitative predictors below, automatic for categorical predictors.
 - Independence of observations:  It is reasonable to assume that Kickstarter campaigns independent. 
 - Randomness: We know that we didn't capture all Kickstarter campaigns from 2009-2020, but we will assume that the 170,000 scraped campaigns are a random subset of the population.
@@ -427,8 +444,8 @@ emplogitplot1(outcome ~ campaign_length, data = train, xlab = "campaign length (
 
 ### {-}
 
-`goal_usd` does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. `name_length` has a linear relationship with the log odds of the outcome. 
-The empirical logit plot for `campaign_length` looks concerning. 
+Funding goal does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. The name length has a linear relationship with the log odds of the outcome. 
+The empirical logit plot for the campaign length looks concerning in terms of both linearity and strength of the relationship.
 
 ### Categorical Variables  {.tabset .tabset-fade .tabset-pills}
 
@@ -497,10 +514,10 @@ train_g %>% group_by(launch_month) %>% summarize(freq = sum(outcome == 1)/n()) %
 
 ### {-}
 
-- `staff_pick`: 51.9% of campaigns that were not staff picks were successful, while 90.1% of campaigns that were staff picks were successful.
-- `main_category`: The top 3 categories were comics, publishing, and games: 87.8% of comic campaigns were successful, 70.2% of publishing campaigns were successful, and 69.4% of game campaigns were successful. The bottom 3 categories were Journalism, Crafts, and Food: 23.1% of journalism campaigns were successful, 28.5% of craft campaigns were successful, and 29.4% of food campaigns were successful.
-- `launch_day`: Tuesday is the best day to launch a campaign, as 60.7% of campaigns launched on Tuesday were successful. Saturday is the worst, since only 54.3% of campaigns launched on that day were successful.
-- `launch_month`: October is the best month to launch a campaign, as 59.7% of campaigns launched in October were successful. December is the worst, since only 50.6% of campaigns launched in December were successful.
+- Staff Pick: 51.9% of campaigns that were not staff picks were successful, while 90.1% of campaigns that were staff picks were successful.
+- Main Category: The top 3 categories were comics, publishing, and games: 87.8% of comic campaigns were successful, 70.2% of publishing campaigns were successful, and 69.4% of game campaigns were successful. The bottom 3 categories were Journalism, Crafts, and Food: 23.1% of journalism campaigns were successful, 28.5% of craft campaigns were successful, and 29.4% of food campaigns were successful.
+- Launch Day: Tuesday is the best day to launch a campaign, as 60.7% of campaigns launched on Tuesday were successful. Saturday is the worst, since only 54.3% of campaigns launched on that day were successful.
+- Launch Month: October is the best month to launch a campaign, as 59.7% of campaigns launched in October were successful. December is the worst, since only 50.6% of campaigns launched in December were successful.
 
 
 ## Model Fitting
@@ -523,17 +540,17 @@ summary(mod.small)
 summary(mod.final)
 ```
 
-Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the `main_category` predictor. We will remove launch_month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the predictor `main_category` in our model, we will perform a nested likelihood ratio test (LRT).
+Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the main category predictor. We will remove launch month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the main category predictor in our model, we will perform a nested likelihood ratio test (LRT).
 
 ```{r}
 lrtest(mod.full, mod.small)
 ```
 
-The nested LRT returns a significant p-value, meaning that the additional predictor, `main_cateogry`, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep `main_category` in the final model. The final model has the lowest AIC, so we will proceed with that model.
+The nested LRT returns a significant p-value, meaning that the additional predictor, main category, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep main category in the final model. The final model has the lowest AIC, so we will proceed with that model.
 
 ## Final Model Interpretation
 
-The predictor with the largest effect size is `staff_pick`. The indicator variable `staff_pickTRUE` has a coefficient of 2.61 with an extremely small p-value. An intercept of 2.61 means that the estimated odds of success for a campaign that is a staff pick is 13.6 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is `main_categoryComics`, with a coefficient of 1.49 and an extremely small p-value. An intercept of 1.49 means that the estimated odds of success for a comic book campaign is 4.44 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
+The predictor with the largest effect size is staff pick. The indicator variable that corresponds to staff pick being true has a coefficient of 2.61 with an extremely small p-value. An intercept of 2.61 means that the estimated odds of success for a campaign that is a staff pick is 13.6 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is the indicator variable that corresponds to the comic category, with a coefficient of 1.49 and an extremely small p-value. An intercept of 1.49 means that the estimated odds of success for a comic book campaign is 4.44 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
 
 ## Model Evaluation
 

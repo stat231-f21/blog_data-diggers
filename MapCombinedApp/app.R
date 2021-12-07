@@ -110,7 +110,7 @@ server <- function(input, output) {
         datatable(data_for_table(), escape = FALSE, # escape = FALSE allows links to be clickable
                   extensions = c("Buttons"), 
                   options = list(dom = 't',
-                                 pageLength = 14))
+                                 pageLength = 15))
     })
     
     # MAP

@@ -330,7 +330,8 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
        x = "Campaign Length (in days)",
        y = "Success Rate",
        size = "Number of Campaigns") +
-  facet_wrap(~ year) +
+  facet_wrap(~ year) +   
+  scale_size_continuous(limits = c(1, 10000)) +
   theme_minimal()
 ```
 

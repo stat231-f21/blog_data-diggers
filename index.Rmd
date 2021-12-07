@@ -315,7 +315,7 @@ ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
 
 ### 2012-2020
 
-```{r}
+```{r, message = FALSE}
 # for 2012-2020
 camplength2 <- date_data %>%
   group_by(campaign_length, year) %>%

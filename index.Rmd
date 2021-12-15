@@ -245,9 +245,9 @@ afinn_tbl_pretty
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
-# Univariate Analysis
+# Univariate Analysis of Potential Predictors
 
-This section examines both the categorical and quantitative variables that describe the Kickstarter campaigns in our data set. Categorical variables include staff pick status, launch day, launch month, launch year, and category. Our quantative variables are campaign length and goal size.
+This section examines both the categorical and quantitative variables that describe the Kickstarter campaigns in our data set. We analyze variables that are known when the campaign is first launched and could potentially be used to predict a campaign's chance of reaching its goal. We don't include amount funded as a potential predictor since it is not known until after the campaign ends. Selected categorical variables include staff pick status, launch day, launch month, launch year, and category. Quantitative variables are campaign length and goal size.
 
 ## Categorical Variables 
 

@@ -48,6 +48,8 @@ Source: Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about
 
 ## What was our motivation?
 
+As more individual and creative projects are soaring, we wanted to analyze the trend of Kickstarter projects throughout the years and determine if we could predict the probability of success of a launched project. Ultimately, we want to understand what factors go into making a successful campaign, if any? For anyone wanting to launch a campaign of their own, this blog is intended to support prospective creators in the process, from writing a strong project description to determining the best launch day, we want to inspire creators as they begin their creative endeavors. 
+
 ## How did we get the data?
 
 A company called [Web Robots](https://webrobots.io/kickstarter-datasets/) has a web crawler that scrapes data from [Kickstarter's website](https://www.kickstarter.com/) every month. We aggregated 58 csv files that were scraped by their web crawler in December of 2020. Since the columns are the same across csv files, we simply read in all of the csv files and bound the rows together.

@@ -245,22 +245,64 @@ afinn_tbl_pretty
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
 
-# Project Launch Analysis
+# Univariate Analysis
 
-This section focuses on the launching process of a Kickstarter project. We aim to examine the trends of successful projects through 2009-2020 based on launch month, launch day, success rates throughout the years, and campaign length. 
+This section examines both the categorical and quantitative variables that describe the Kickstarter campaigns in our data set. Categorical variables include staff pick status, launch day, launch month, launch year, and category. Our quantative variables are campaign length and goal size.
 
-## Launch Month and Success Rate
+## Categorical Variables 
 
-#### What is the best month to launch a project?
+### Bar Graphs {.tabset .tabset-fade .tabset-pills}
 
-```{r}
-# wrangling
+#### Staff Pick
+```{r Staff Pick}
+# make table
+staff_pick_success <- kickstarter %>% 
+  select(staff_pick,
+         outcome) %>% 
+  group_by(staff_pick) %>% 
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n)
+# make graph
+ggplot(data = staff_pick_success, aes(x = staff_pick, y = success_rate)) + 
+  geom_bar(stat = "identity", fill = "#05ce78") + 
+  labs(title = "Success Rate by Staff Pick",
+       x = "Staff Pick",
+       y = "Success Rate") +
+  theme_minimal() +
+  geom_label(aes(label = round(success_rate, 3))) 
+```
+
+#### Launch Day
+```{r Date Wrangling}
+# wrangling dates
 date_data <- kickstarter %>%
   select(c("launched_at", "outcome", "proportion_funded", "pct_funded", "campaign_length")) %>%
   separate(launched_at, c("date", "time"), sep = " ") %>%
   mutate(month = months(as.Date(date)),
          day = weekdays(as.Date(date)),
          year = year(as.Date(date))) 
+```
+
+```{r Launch Day}
+# dataset for day
+day_data <- date_data %>%
+  group_by(day) %>%
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) 
+# day barplot
+ggplot(data = day_data, aes(x = day, y = success_rate)) +
+  geom_bar(stat = "identity", fill = "#05ce78") +
+  labs(title = "Success Rate by Launch Day",
+       x = "Day",
+       y = "Success Rate") +
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",
+                              "Thursday", "Friday", "Saturday")) +
+  geom_label(aes(label = round(success_rate, 3))) +
+  theme_minimal()
+```
+
+#### Launch Month
+```{r Launch Month}
 # dataset for month
 month_data <- date_data %>%
   group_by(month) %>%
@@ -279,31 +321,64 @@ p2 <- month_data %>%
 p2
 ```
 
-
-## Launch Day and Success Rate
-
-#### What is the best day to launch a project?
-
-```{r}
-#dataset for day
-day_data <- date_data %>%
-  group_by(day) %>%
+<!-- #### Launch Year (shown in time series graph, not needed here)--> 
+```{r include = FALSE}
+# dataset for year
+year_data_bar <- date_data %>%
+  group_by(year) %>%
   summarise(n = n(),
-            success_rate = sum(outcome=="successful")/n) 
-# day barplot
-ggplot(data = day_data, aes(x = day, y = success_rate)) +
-  geom_bar(stat = "identity", fill = "#05ce78") +
-  labs(title = "Success Rate by Launch Day",
-       x = "Day",
+            success_rate = sum(outcome=="successful")/n) %>% 
+  mutate(year = as.factor(year))
+# reverse order of the years
+year_data_bar$year <- factor(year_data_bar$year, 
+                         levels=rev(levels(year_data_bar$year)))
+# creating bar plot
+year_data_bar %>%
+  ggplot(aes(x = year, y = success_rate)) +
+  geom_bar(stat = "identity", fill = "#05ce78") + coord_flip() +
+  labs(title = "Success Rate by Launch Year", 
+       x = "Year",
        y = "Success Rate") +
-  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday",
-                              "Thursday", "Friday", "Saturday")) +
   geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 ```
 
-## Trend in Success Rate 2009-2020
 
+#### Category
+```{r Category}
+# make table
+cat_success <- kickstarter %>% 
+  select(main_category,
+         outcome) %>% 
+  group_by(main_category) %>% 
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) %>% 
+  mutate(main_category = as.factor(main_category))
+# reverse order of the categories
+cat_success$main_category <- factor(cat_success$main_category, 
+                         levels=rev(levels(cat_success$main_category)))
+# make bar graph
+ggplot(data = cat_success, aes(x = main_category, y = success_rate)) + 
+  geom_bar(stat = "identity", fill = "#05ce78") + 
+  labs(title = "Success Rate by Category",
+       x = "Category",
+       y = "Success Rate") +
+  theme_minimal() +
+  coord_flip() +
+  geom_label(aes(label = round(success_rate, 3))) 
+```
+
+
+### {-}
+
+- Staff Pick: 51.8% of campaigns that were not staff picks were successful, while 90.2% of campaigns that were staff picks were successful.
+- Launch Day: Tuesday is the best day to launch a campaign, as 60.7% of campaigns launched on Tuesday were successful. Saturday is the worst, since only 53.9% of campaigns launched on that day were successful.
+- Launch Month: October is the best month to launch a campaign, as 59.7% of campaigns launched in October were successful. December is the worst, since only 50.7% of campaigns launched in December were successful.
+- Category: The top 3 categories were comics, publishing, and games: 87.4% of comic campaigns were successful, 70.2% of publishing campaigns were successful, and 69.4% of game campaigns were successful. The bottom 3 categories were Journalism, Crafts, and Food: 24.1% of journalism campaigns were successful, 28.1% of craft campaigns were successful, and 29.3% of food campaigns were successful.
+
+
+
+### Year
 ```{r}
 # dataset for year
 year_data <- date_data %>%
@@ -320,7 +395,8 @@ gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
   transition_reveal(year) +
   theme_minimal() + 
   geom_text(aes(label = scales::percent(success_rate, accuracy = 1),
-                vjust = -2), show.legend = FALSE)
+                vjust = -2), show.legend = FALSE) +
+  scale_x_discrete(limits = 2009:2020)
 
 # saving line plot into a gif
 animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, renderer = gifski_renderer())
@@ -329,13 +405,15 @@ animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, render
 ```
 
 
-## Campaign Length and Success Rate {.tabset .tabset-fade .tabset-pills}
+## Quantitative Variables  
+
+### Campaign Length {.tabset .tabset-fade .tabset-pills}
 
 From 2009-2011, Kickstarter creators were able to set campaign lengths of up to 90 days. However, in 2011, Kickstarter claimed that through their own research, they found that projects lasting longer than 60 days were less successful than projects with shorter campaign lengths, Thus, after 2011, campaign lengths were recommended to be at most 30-60 days (Strickler, 2011). 
 
 In this section, we analyze the validity of Kickstarter's findings: Do shorter campaign lengths correlate with higher success rates on Kickstarter projects? 
 
-### 2011
+#### 2011
 
 ```{r, message = FALSE}
 # dataset for campaign length (2011)
@@ -355,7 +433,7 @@ ggplot(camplength1, aes(x = campaign_length, y = success_rate, size = n)) +
   theme_minimal()
 ```
 
-### 2012-2020
+#### 2012-2020
 
 ```{r, message = FALSE}
 # for 2012-2020
@@ -376,6 +454,37 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
   scale_size_continuous(limits = c(1, 10000)) +
   theme_minimal()
 ```
+
+### Goal Size
+```{r}
+# dataset for goal size 
+goal_size <- kickstarter %>% 
+  select(goal_usd, outcome) %>% 
+  # cut up funding goals
+  group_by(cuts=cut(goal_usd, c(-1, 100, 1000, 10000, 100000, 1000000, Inf))) %>% 
+  summarise(n = n(),
+            success_rate = sum(outcome=="successful")/n) %>% 
+  mutate(cuts = as.factor(cuts),
+         cuts_clean = case_when(cuts == "(-1,100]" ~ "0-100",
+                                cuts == "(100,1e+03]" ~ "100-1000",
+                                cuts == "(100,1e+03]" ~ "100-1000",
+                                cuts == "(1e+03,1e+04]" ~ "1000-10000",
+                                cuts == "(1e+04,1e+05]" ~ "10000-100000",
+                                cuts == "(1e+05,1e+06]" ~ "100000-1000000",
+                                cuts == "(1e+06,Inf]" ~ ">1000000"))
+# make graph
+ggplot(goal_size, aes(x = reorder(cuts_clean, -success_rate), 
+                      y = success_rate)) +
+ geom_col(fill = "#05ce78") +
+  labs(title = "Success of Kickstarter Projects by Goal Size",
+       x = "Goal Size ($)",
+       y = "Success Rate") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  geom_label(aes(label = round(success_rate, 3))) 
+
+```
+
 
 
 # Logistic Regression Model to Predict Success Rate
@@ -471,78 +580,6 @@ emplogitplot1(outcome ~ campaign_length, data = train, xlab = "campaign length (
 
 Funding goal does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. The name length has a linear relationship with the log odds of the outcome. 
 The empirical logit plot for the campaign length looks concerning in terms of both linearity and strength of the relationship.
-
-### Categorical Variables  {.tabset .tabset-fade .tabset-pills}
-
-#### Staff Pick
-```{r}
-# staff pick
-gf_percents(~ staff_pick, fill = ~ as.factor(outcome), position = "fill", data = train, title = "Staff Pick Mosiac Plot", xlab = "Staff Pick", ylab = "Outcome Percent") +
-  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
-```
-
-```{r eval = FALSE}
-# raw numbers
-train %>% group_by(staff_pick) %>% summarize(freq = sum(outcome == 1)/n())
-```
-
-
-#### Launch Category
-```{r}
-# main category
-gf_percents(~ main_category, fill = ~ as.factor(outcome), position = "fill", data = train, title = "Main Category Mosiac Plot", xlab = "Main Category", ylab = "Outcome Percent") + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
-```
-
-```{r eval = FALSE}
-# raw numbers
-train %>% group_by(main_category) %>% summarize(freq = sum(outcome == 1)/n()) %>% arrange(desc(freq))
-```
-
-#### Launch Weekday
-```{r}
-# launch day of week 
-train_g <- train %>% 
-  mutate(launch_day = as.character(launch_day),
-         launch_day = case_when(launch_day == "1" ~ "Sunday",
-                                 launch_day == "2" ~ "Monday",
-                                 launch_day == "3" ~ "Tuesday",
-                                 launch_day == "4" ~ "Wednesday",
-                                 launch_day == "5" ~ "Thursday",
-                                 launch_day == "6" ~ "Friday",
-                                 launch_day == "7" ~ "Saturday",
-                            TRUE ~ launch_day),
-                            launch_day = as.factor(launch_day)) 
-train_g$launch_day <- factor(train_g$launch_day, levels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
-                          
-gf_percents(~ factor(launch_day), fill = ~ as.factor(outcome), position = "fill", data = train_g, title = "Launch Weekday Mosiac Plot", xlab = "Launch Weekday", ylab = "Outcome Percent") + 
-  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78")) 
-```
-
-```{r eval = FALSE}
-# raw numbers
-train_g %>% group_by(launch_day) %>% summarize(freq = sum(outcome == 1)/n())
-```
-
-#### Launch Month
-```{r}
-# launch month
-gf_percents(~ factor(launch_month), fill = ~ as.factor(outcome), position = "fill", data = train, title = "Launch Month Mosiac Plot", xlab = "Launch Month", ylab = "Outcome Percent") + 
-  scale_fill_manual(name = "Outcome", labels = c("0 - Failed", "1 - Succcessful"), values = c("#ed4752", "#05ce78"))
-```
-
-```{r eval = FALSE}
-# raw numbers
-train_g %>% group_by(launch_month) %>% summarize(freq = sum(outcome == 1)/n()) %>% arrange(desc(freq))
-```
-
-### {-}
-
-- Staff Pick: 51.9% of campaigns that were not staff picks were successful, while 90.1% of campaigns that were staff picks were successful.
-- Main Category: The top 3 categories were comics, publishing, and games: 87.8% of comic campaigns were successful, 70.2% of publishing campaigns were successful, and 69.4% of game campaigns were successful. The bottom 3 categories were Journalism, Crafts, and Food: 23.1% of journalism campaigns were successful, 28.5% of craft campaigns were successful, and 29.4% of food campaigns were successful.
-- Launch Day: Tuesday is the best day to launch a campaign, as 60.7% of campaigns launched on Tuesday were successful. Saturday is the worst, since only 54.3% of campaigns launched on that day were successful.
-- Launch Month: October is the best month to launch a campaign, as 59.7% of campaigns launched in October were successful. December is the worst, since only 50.6% of campaigns launched in December were successful.
 
 
 ## Model Fitting

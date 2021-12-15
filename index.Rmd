@@ -487,7 +487,7 @@ ggplot(goal_size, aes(x = reorder(cuts_clean, -success_rate),
 
 
 
-# Logistic Regression Model to Predict Success Rate
+# Multivariable Thinking With a Logistic Regression Model
 ```{r prepare data}
 # cast categorical predictors into factors, mutate outcome into 0 = failed, 1 = successful
 kickstarter_init <- kickstarter %>% 

@@ -709,6 +709,6 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 # References
 
-Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter success_ https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743
+Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter success_. Towards Data Science. https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743
 
 Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about

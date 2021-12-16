@@ -48,7 +48,7 @@ Through the platform, creators can select from a variety of categories to best r
 
 ## What was our motivation?
 
-As more individual and creative projects are soaring, we wanted to analyze the trend of Kickstarter projects throughout the years and determine if we could predict the probability of success of a launched project. Ultimately, we want to understand what factors go into making a successful campaign, if any? For anyone wanting to launch a campaign of their own, this blog is intended to support prospective creators in the process, from writing a strong project description to determining the best launch day, we want to inspire creators as they begin their creative endeavors. 
+As more individual and creative projects are soaring, we wanted to analyze the trend of Kickstarter projects throughout the years and determine if we could predict the probability of success of a launched project. Ultimately, we want to understand what factors go into making a successful campaign, if any. For anyone wanting to launch a campaign of their own, this blog is intended to support prospective creators in the process. From writing a strong project description to determining the best launch day, we want to inspire creators as they embark on their creative endeavors. 
 
 ## How did we get the data?
 
@@ -713,6 +713,6 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter success_. Towards Data Science. https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743
 
-Kickstarter. (2009, April). _About_. https://www.kickstarter.com/about
+Kickstarter. (2009). _About_. https://www.kickstarter.com/about
 
 Strickler, Yancey. (2011, June 17). _Shortening the Maximum Project Length_. The Kickstarter Blog. https://www.kickstarter.com/blog/shortening-the-maximum-project-length 

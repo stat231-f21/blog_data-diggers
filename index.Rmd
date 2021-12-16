@@ -529,6 +529,8 @@ train <- kickstarter_subset[sample, ]
 test <- kickstarter_subset[!sample, ]
 ```
 
+We begin by splitting our data set into training and testing sets. 70% of the Kickstarter campaigns are put into the training set while the other 30% are put into the testing set. Splitting the data into training and testing set allows us to see how well our model preforms on an out of sample data set. In other words, it allows us to test our model's predictive ability on data that it has never seen before. 
+
 ## Predictors
 1) `goal_usd` (Quantitative, $): The chosen amount of money in USD a company needs to raise to have a successful campaign.
 2) `campaign_length` (Quantitative, Days): The chosen length of the campaign, ranging from 0-90 in 2009-2011, and 0-60 in 2012-2020.
@@ -591,8 +593,7 @@ emplogitplot1(outcome ~ campaign_length, data = train, xlab = "campaign length (
 
 ### {-}
 
-Funding goal does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. The name length has a linear relationship with the log odds of the outcome. 
-The empirical logit plot for the campaign length looks concerning in terms of both linearity and strength of the relationship.
+Funding goal does not initially have a linear relationship with the log odds of the outcome, so we applied a square root transformation. A square root transformation will inflate smaller goals and stabilize larger ones, which is helpful here because of the right skewed distribution of Kickstarter goals. The name length has a linear relationship with the log odds of the outcome. The empirical logit plot for the campaign length looks concerning in terms of both linearity and strength of the relationship.
 
 
 ## Model Fitting
@@ -703,6 +704,10 @@ $$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24055)}{(24055 + 4958)} = 0.8291$$
 
 The model's recall is 82.91%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 82.91% of the time (true positive rate). In other words, it correctly identifies 82.91% of all successful campaigns. 
 
+## Model Takeaways
+
+Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones. The model's accuracy could potentially be improved in the future by other adding information not captured in our data set such as campaign [reward](https://www.kickstarter.com/help/handbook/rewards) pricing structure.
+
 # Prediction App
 
 <iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="650" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
@@ -723,4 +728,9 @@ Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter su
 
 Kickstarter. (2009). _About_. https://www.kickstarter.com/about
 
+Kickstarter (2009). _Building Rewards_. https://www.kickstarter.com/help/handbook/rewards
+
 Strickler, Yancey. (2011, June 17). _Shortening the Maximum Project Length_. The Kickstarter Blog. https://www.kickstarter.com/blog/shortening-the-maximum-project-length 
+
+James, Gareth (2021, August 4) _Logistic Regression_. UC Business Analytics R Programming Guide.
+https://uc-r.github.io/logistic_regression

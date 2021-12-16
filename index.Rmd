@@ -44,7 +44,7 @@ options(knitr.kable.NA = '')
 
 Kickstarter, founded in 2009, is an online crowdfunding platform. Their mission is to help "bring creative projects to life" (Kickstarter, 2009) as individuals can create projects that draw others to support the process. 
 
-Through the platform, creators can select from a variety of categories to best represent their project topic, set a campaign length, qne set a funding goal, among other campaign descriptors. Essentially, creators have full control of how they present their vision to others. If a project is promising, backers—people who support a project—can pledge any amount of money to support the process. Creators can also set rewards to backers who pledge certain amounts of money. If the project does not reach its goal by the end of the campaign length, no money is lost. But if a project is successful, the funds go to bringing the project to fruition. 
+Through the platform, creators can select from a variety of categories to best represent their project topic, set a campaign length, and set a funding goal, among other campaign descriptors. Essentially, creators have full control of how they present their vision to others. If a project is promising, backers—people who support a project—can pledge any amount of money to support the process. Creators can also set rewards to backers who pledge certain amounts of money. If the project does not reach its goal by the end of the campaign length, no money is lost. But if a project is successful, the funds go to bringing the project to fruition. 
 
 ## What was our motivation?
 
@@ -406,9 +406,9 @@ animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, render
 
 ```
 
-The success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
+Animated with the `gganimate` package, the above time series plot shows that the success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
 
-Laura Lewis, an Amazon data scientist that looked at Kickstarter success trends throughout the years, created a time series plot with the total number of launched projects each year from 2009-2019. She found that by 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched in 2014 (Lewis, 2019). Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
+Laura Lewis, an Amazon data scientist who examined Kickstarter success trends throughout the years, created a time series plot with the total number of launched projects each year from 2009-2019. She found that by 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched in 2014 (Lewis, 2019). Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
 
 
 

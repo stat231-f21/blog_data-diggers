@@ -44,8 +44,6 @@ options(knitr.kable.NA = '')
 
 Kickstarter, founded in 2009, is an online crowdfunding platform. Their mission is to help "bring creative projects to life" (Kickstarter, 2009) as individuals can create projects that draw others to support the process. 
 
-Source: Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about
-
 ## What was our motivation?
 
 As more individual and creative projects are soaring, we wanted to analyze the trend of Kickstarter projects throughout the years and determine if we could predict the probability of success of a launched project. Ultimately, we want to understand what factors go into making a successful campaign, if any? For anyone wanting to launch a campaign of their own, this blog is intended to support prospective creators in the process, from writing a strong project description to determining the best launch day, we want to inspire creators as they begin their creative endeavors. 
@@ -406,6 +404,11 @@ animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, render
 
 ```
 
+The success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
+
+Laura Lewis, an Amazon data scientist that looked at Kickstarter success trends throughout the years, created a time series plot with the total number of launched projects each year from 2009-2019. She found that by 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched in 2014 (Lewis, 2019). Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
+
+
 
 ## Quantitative Variables  
 
@@ -703,3 +706,9 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 # Conclusion
 
 
+
+# References
+
+Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter success_ https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743
+
+Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about

@@ -66,7 +66,7 @@ all_data <- files %>%
 
 Once we had all the data in a single data frame, we could start making visualizations and models, right? Well... not so fast. There was a substantial amount of data wrangling and cleaning that had to be done before we could get to the fun stuff. Our initial csv file had 213,564 Kickstarter campaigns with 24,135 duplicates. 
 
-After removing the duplicate campaigns, we filtered for only the campaigns that succeeded or failed, removing those that were ongoing, suspended, or canceled. We also fixed various issues in the columns of the data set, such as inconsistencies in the conversion of the goal and pledged amounts to USD, an inaccurate country column, and a JSON formatted category column, just to name a few. After cleaning the data, we were left with 170,536 Kickstarter campaigns in our data frame. If you like digging into data and are eager to learn more about our data wrangling process, please check out the code on github. 
+After removing the duplicate campaigns, we filtered for only the campaigns that succeeded or failed, removing those that were ongoing, suspended, or canceled. We also fixed various issues in the columns of the data set, such as inconsistencies in the conversion of the goal and pledged amounts to USD, an inaccurate country column, and a JSON formatted category column, just to name a few. After cleaning the data, we were left with 170,536 Kickstarter campaigns in our data frame. If you like digging into data and are eager to learn more about our data wrangling process, please check out the [code](https://github.com/stat231-f21/blog_data-diggers/blob/079c15b0d7ad6721d54d129b0aa8c50ac8eb18f6/data-wrangling.Rmd) on github. 
 
 
 # Success by State and Category

@@ -406,7 +406,7 @@ animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, render
 
 ```
 
-Animated with the `gganimate` package, the above time series plot shows that the success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
+Animated with the [`gganimate`](https://gganimate.com/) package, the above time series plot shows that the success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
 
 Laura Lewis, an Amazon data scientist who examined Kickstarter success trends throughout the years, created a time series plot with the total number of launched projects each year from 2009-2019. She found that by 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched in 2014 (Lewis, 2019). Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
 
@@ -601,9 +601,6 @@ The empirical logit plot for the campaign length looks concerning in terms of bo
 mod.full <- glm(outcome ~ sqrt_goal_usd + name_length + campaign_length + 
                   staff_pick + launch_day + launch_month + 
                   main_category, data = train, family = "binomial")
-mod.small <- glm(outcome ~ sqrt_goal_usd + name_length + 
-                   campaign_length + staff_pick + launch_day + 
-                   launch_month, data = train, family = "binomial")
 mod.final <- glm(outcome ~ sqrt_goal_usd + name_length + 
                    campaign_length + staff_pick + launch_day + 
                    main_category, data = train, family = "binomial")
@@ -611,21 +608,20 @@ mod.final <- glm(outcome ~ sqrt_goal_usd + name_length +
 
 ```{r model summary, eval = FALSE}
 summary(mod.full)
-summary(mod.small)
 summary(mod.final)
 ```
 
-Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the main category predictor. We will remove launch month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the main category predictor in our model, we will perform a nested likelihood ratio test (LRT).
+Using a Wald test for each predictor, all predictors are significant at an alpha level of 0.05, with the exception of launch_month and a single level of the main category predictor. We will remove launch month since it is not significant. There does not appear to be a significant difference between the dance category and our baseline category, art. In order to see if we should keep the main category predictor in our model, we will perform a chi-squared test.
 
-```{r}
-lrtest(mod.full, mod.small)
+```{r echo = TRUE}
+car::Anova(mod.final, type = "III")
 ```
 
-The nested LRT returns a significant p-value, meaning that the additional predictor, main category, significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep main category in the final model. The final model has the lowest AIC, so we will proceed with that model.
+The chi-squared test returns a significant p-value an alpha level of 0.05 for the main category predictor, meaning that it significantly helps in the prediction of the log(odds) of the outcome. Therefore, we will keep main category in the final model. The chi-squared test also shows that all other predictors in our final model are significant, so we will proceed with this model.
 
 ## Final Model Interpretation
 
-The predictor with the largest effect size is staff pick. The indicator variable that corresponds to staff pick being true has a coefficient of 2.61 with an extremely small p-value. An intercept of 2.61 means that the estimated odds of success for a campaign that is a staff pick is 13.6 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is the indicator variable that corresponds to the comic category, with a coefficient of 1.49 and an extremely small p-value. An intercept of 1.49 means that the estimated odds of success for a comic book campaign is 4.44 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
+The predictor with the largest effect size is staff pick. The indicator variable that corresponds to staff pick being true has a coefficient of 2.62 with an extremely small p-value. An intercept of 2.62 means that the estimated odds of success for a campaign that is a staff pick is 13.7 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is the indicator variable that corresponds to the comic category, with a coefficient of 1.48 and an extremely small p-value. An intercept of 1.48 means that the estimated odds of success for a comic book campaign is 4.40 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
 
 ## Model Evaluation
 

@@ -713,4 +713,6 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 Lewis, Laura. (2019, April 9). _Using machine learning to predict Kickstarter success_. Towards Data Science. https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743
 
-Kickstarter. (2009, April). _About_ https://www.kickstarter.com/about
+Kickstarter. (2009, April). _About_. https://www.kickstarter.com/about
+
+Strickler, Yancey. (2011, June 17). _Shortening the Maximum Project Length_. The Kickstarter Blog. https://www.kickstarter.com/blog/shortening-the-maximum-project-length 

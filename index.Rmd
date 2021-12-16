@@ -713,6 +713,7 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 # Conclusion
 
+Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign. 
 
 
 # References

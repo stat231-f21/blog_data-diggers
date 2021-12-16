@@ -715,6 +715,11 @@ The model's recall is 82.91%, meaning that of all the successful campaigns, the 
 
 Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign. 
 
+So after reading this blog, you've decided on what your Kickstarter campaign will look like: Being from Vermont, you will create a campaign under the Publishing category and set a campaign goal of $2000 to be reached within 30 days. You will launch it on a Tuesday, maybe give it a fairly long title with 37 characters and ensure that your blurb somehow fits the words _book_, _children's_, and _illustrated_. And you really, really hope that your project get chosen for staff pick. You've got the perfect plan! Your campaign is bound to succeed...or is it? 
+
+
+
+
 
 # References
 

@@ -264,7 +264,7 @@ The blurb sentiment graphs show that regardless of lexicon, the sentiment of blu
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
-The comparison word cloud compares the relative frequency of words across failed and successful campaigns in the chosen category and sizes the words based on that relative frequency. For example, the words "enamel" and "pins" show up in both failed and successful art campaigns but show up many more times in successful campaigns, so they appear as large green words on the successful side. This would suggest that enamel pin projects tend to do well on Kickstarter. A comparison word cloud provides much more utility than a normal word cloud in this context because it allows you to see which words show up the most in successful and failed campaigns for each category. This word cloud provides granular information as to which campaigns tend to succeed in a way that other visualizations cannot. We urge you to go through the categories and see the most commonly used words in the blurbs of successful and failed campaigns. 
+The comparison word cloud compares the relative frequency of words across failed and successful campaigns in the chosen category and sizes the words based on that relative frequency. For example, the words "enamel" and "pins" show up in both failed and successful art campaigns but show up many more times in successful campaigns, so they appear as large green words on the successful side. This would suggest that enamel pin projects tend to do well on Kickstarter. A comparison word cloud provides much more utility than a normal word cloud in this context because it allows you to see which words show up the most in successful and failed campaigns for each category. This word cloud provides granular information as to which campaigns tend to succeed in a way that other visualizations cannot. We encourage you to go through the categories and see the most commonly used words in the blurbs of successful and failed campaigns. 
 
 We created this visualization using the `comparison.cloud()` function from the [`wordcloud`](https://github.com/cran/wordcloud) package. 
 
@@ -762,7 +762,7 @@ Given the features in our data set, we are satisfied with the accuracy of our fi
 
 The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign reward pricing structure. 
 
-# Prediction App
+# Success Prediction App
 
 <iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="650" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 

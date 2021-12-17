@@ -50,7 +50,7 @@ When starting their project, creators choose one of the fifteen categories, set 
 
 While Kickstarter makes it easy to explore projects on their website, they do not have many tools that let you explore the underlying trends in Kickstarter campaigns. We were interested in digging deeper to understand what attributes the most successful campaigns have. If we could uncover the features of Kickstarter campaigns that drive success, then we could help creators optimize their projects. 
 
-From writing a strong project description to determining the best launch day, we want to inspire creators as they embark on their creative endeavors. As crowdfunding continues to grow in popularity, more and people will benefit from analyses like these. 
+We want to aid creators as they embark on their creative endeavors, whether it be finding the best words to describe their project or determining the best launch day. As crowdfunding continues to grow in popularity, more and people will benefit from analyses like these. 
 
 ## How did we get the data?
 
@@ -78,7 +78,7 @@ After removing the duplicate campaigns, we filtered for only the campaigns that 
 
 The interactive table makes it easy to compare the success rates of the 15 Kickstarter categories in all states or a specific US state. It ranks the Kickstarter categories based on their success rates in descending order. For all US states, comic book projects have the highest success rate with over 87% of comic book campaigns reaching their funding goal. On the other hand, journalism projects have the lowest success rate in all US states, with a measly 24% of projects reaching their funding goal. 
 
-To compare success rates for a specific category across states, we can use the map and select a category. Darker states have higher success rates in the selected category. For all categories, campaigns in Vermont, Massachusetts, and New York have the highest success rates while campaigns in South Dakota, Florida, and Mississippi have the lowest success rates. If we select Photography as a category for example, we can see that Nevada has the highest success rate by far, since it is a much darker shade of green than the other states. This may be explained by Nevada being home to the [Burning Man Festival](https://en.wikipedia.org/wiki/Burning_Man), for which successful Photography campaigns like [this](https://www.kickstarter.com/projects/zippylomax/dusty-playground?ref=discovery_category_most_funded&term=burning%20man) are centered around. 
+To compare success rates for a specific category across states, we can use the map and select a category. Darker states have higher success rates in the selected category. For all categories, campaigns in Vermont, Massachusetts, and New York have the highest success rates while campaigns in South Dakota, Florida, and Mississippi have the lowest success rates. If we select photography as a category for example, we can see that Nevada has the highest success rate by far, since it is a much darker shade of green than the other states. This may be explained by Nevada being home to the [Burning Man Festival](https://en.wikipedia.org/wiki/Burning_Man), for which successful Photography campaigns like [this](https://www.kickstarter.com/projects/zippylomax/dusty-playground?ref=discovery_category_most_funded&term=burning%20man) are centered around. 
 
 We used the [`ggplot2`](https://ggplot2.tidyverse.org/index.html) and [`ggiraph`](https://davidgohel.github.io/ggiraph/index.html) packages to make the map, and the [`miniUI`](https://github.com/rstudio/miniUI) package to add the table and map symbols in the app.  
 
@@ -167,7 +167,7 @@ afinn_scores <- blurb_sentiment_fin %>%
   summarize(sentiment_score = sum(value))
 ```
 
-We used two different lexicons to perform our text analysis. First, we used the Bing lexicon, which categorizes words as either positive or negative. In order to calculate a sentiment score for each campaign, we added up the number of positive and negative words in their blurbs and then found the difference. Next, we used the Afinn lexicon, which categorizes words on a scale from -5 to 5, -5 being the most negative and 5 the most positive. To get a sentiment score for each campaign using the Afinn lexicon, we summed the score for each word the campaign's blurb. 
+We used two different lexicons to perform our text analysis. First, we used the Bing lexicon, which categorizes words as either positive or negative. To calculate a sentiment score for each campaign, we added up the number of positive and negative words in their blurbs and then found the difference. Next, we used the Afinn lexicon, which categorizes words on a scale from -5 to 5, -5 being the most negative and 5 the most positive. To get a sentiment score for each campaign using the Afinn lexicon, we summed the score for each word the campaign's blurb. 
 
 
 ### Bing Lexicon
@@ -264,14 +264,14 @@ The blurb sentiment graphs show that regardless of lexicon, the sentiment of blu
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
-The comparison word cloud compares the relative frequency of words across failed and successful campaigns in the chosen category and sizes the words based on that relative frequency. For example, the words "enamel" and "pins" show up in both failed and successful art campaigns but show up many more times in successful campaigns, so they appear as large green words on the successful side. This would suggest that enamel pin projects tend to do well on Kickstarter. A comparison word cloud provides much more utility than a normal word cloud in this context because it allows you to see which words show up the most in successful and failed campaigns for each category. This word cloud provides granular information as to which campaigns tend to succeed in a way that other visualizations cannot. 
+The comparison word cloud compares the relative frequency of words across failed and successful campaigns in the chosen category and sizes the words based on that relative frequency. For example, the words "enamel" and "pins" show up in both failed and successful art campaigns but show up many more times in successful campaigns, so they appear as large green words on the successful side. This would suggest that enamel pin projects tend to do well on Kickstarter. A comparison word cloud provides much more utility than a normal word cloud in this context because it allows you to see which words show up the most in successful and failed campaigns for each category. This word cloud provides granular information as to which campaigns tend to succeed in a way that other visualizations cannot. We urge you to go through the categories and see the most commonly used words in the blurbs of successful and failed campaigns. 
 
 We created this visualization using the `comparison.cloud()` function from the [`wordcloud`](https://github.com/cran/wordcloud) package. 
 
 
 # Univariate Analysis of Potential Predictors
 
-This section examines both the categorical and quantitative variables that describe the Kickstarter campaigns in our data set. We analyze variables that are known when the campaign is first launched and could potentially be used to predict a campaign's chance of reaching its goal. We don't include amount funded as a potential predictor since it is not known until after the campaign ends. Selected categorical variables include staff pick status, launch day, launch month, launch year, and category. Quantitative variables are campaign length and goal size.
+This section examines both the categorical and quantitative variables that describe the Kickstarter campaigns in our data set. We analyze variables that are known when the campaign is first launched and could potentially be used to predict a campaign's chance of reaching its goal. We don't include amount funded as a potential predictor since it is not known until after the campaign ends. We don't include sentiment score as a potential predictor since scores were very similar between successful and failed campaigns. Selected categorical variables include staff pick status, launch day, launch month, launch year, and category. Quantitative variables are campaign length and goal size.
 
 ## Categorical Variables 
 
@@ -491,7 +491,7 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
 
 ### {-}
 
-In 2011, a year prior to the change in campign length, there is a moderately strong, negative, and roughly linear association between campaign length and success rate. So as the campaign length increases, the success rate decreases. 
+In 2011, a year prior to the change in campaign length, there is a moderately strong, negative, and roughly linear association between campaign length and success rate. So as the campaign length increases, the success rate decreases. 
 
 In the multi-panel plot, created with the `facet_wrap()` function, we see this trend from 2011 continue as the number of campaigns begin to increase significantly. Most of the campaigns in 2012-2020 set a campaign length of approximately 30 days and are more successful than campaigns with much longer campaign lengths. We predict this is because 30 days suggests a greater level of urgency for a project to be backed, especially if it is something that prompts a lot of interest. 
 
@@ -562,13 +562,13 @@ train <- kickstarter_subset[sample, ]
 test <- kickstarter_subset[!sample, ]
 ```
 
-We begin by splitting our data set into training and testing sets. 70% of the Kickstarter campaigns are put into the training set while the other 30% are put into the testing set. Splitting the data into training and testing set allows us to see how well our model preforms on an out of sample data set. In other words, it allows us to test our model's predictive ability on data that it has never seen before. 
+We begin by splitting our data set into training and testing sets. 70% of the Kickstarter campaigns are put into the training set while the other 30% are put into the testing set. The training set contains 119,238 campaigns and the testing set contains 51,298 campaigns. Splitting the data into training and testing set allows us to see how well our model preforms on an out of sample data set. In other words, it allows us to test our model's predictive ability on data that it has never seen before. 
 
 ## Predictors
 1) `goal_usd` (Quantitative, $): The chosen amount of money in USD a company needs to raise to have a successful campaign.
 2) `campaign_length` (Quantitative, Days): The chosen length of the campaign, ranging from 0-90 in 2009-2011, and 0-60 in 2012-2020.
 3) `name_length` (Quantitative, Characters): The length of the startup's name.
-4) `staff_pick` (Categorical, TRUE/FALSE): Whether or not the project was selected by the staff at Kickstarter to be included in the "Projects we Love" section.
+4) `staff_pick` (Categorical, TRUE/FALSE): Whether or not the project was selected by the staff at Kickstarter to be included in the "Projects we Love" section. See [How to Become a Kickstarter “Project We Love”](https://www.crowdcrux.com/become-kickstarter-staff-pick/) to more about getting featured on Kickstarter. 
 5) `main_category` (Categorical): The main category of the campaign. There are 14 main categories (Art, Comics, Crafts, ... etc.).
 6) `launch_day` (Categorical): The day of the week in which the campaign was launched.
 7) `launch_month` (Categorical): The month in which the campaign was launched.
@@ -760,7 +760,7 @@ The model's specificity is 57.47% meaning that of all the failed campaigns, the 
 
 Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
 
-The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign [reward](https://www.kickstarter.com/help/handbook/rewards) pricing structure. 
+The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign reward pricing structure. 
 
 # Prediction App
 
@@ -772,7 +772,7 @@ As far as we know, no other application exists that gives insights into a Kickst
 
 # Conclusion
 
-Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign.
+Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign. The biggest takeaway is that creators should do everything they can to get featured in the "Projects We Love" section. Besides having a strong idea and a compelling project image, according to a [blog post](https://www.kickstarter.com/blog/a-new-way-to-explore-an-incredible-creative-universe) on Kickstarter's website, they recommend that creators email stories@kickstarter.com to maximize their chances of getting featured.
 
 So after reading this blog, you've decided on what your Kickstarter campaign will look like: Being from Vermont, you will create a campaign under the Publishing category and set a campaign goal of $2000 to be reached within 30 days. You will launch it on a Tuesday, maybe give it a fairly long title with 37 characters and ensure that your blurb somehow fits the words _book_, _children's_, and _illustrated_. And you really, really hope that your project gets chosen for staff pick. You've got the perfect plan! Your campaign is bound to succeed...or is it?
 

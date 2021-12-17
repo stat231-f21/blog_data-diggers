@@ -123,7 +123,8 @@ length_summary$outcome <- factor(length_summary$outcome, levels=rev(levels(lengt
 # name length plot
 ggplot(length_summary, aes(x = mean_name_length, y = outcome)) + 
   geom_bar(stat = "identity", aes(fill = outcome)) +
-  theme_minimal() + labs(x = "Mean Name Length (characters)", y = "Outcome", title = "Name Length by Outcome") + 
+  theme_minimal() + labs(x = "Mean Name Length (characters)", 
+                         y = "Outcome", title = "Name Length by Outcome") + 
   geom_label(aes(label = mean_name_length)) +
   scale_fill_manual(values=c("#05ce78", "#ed4752")) +
   theme(legend.position = "none")
@@ -136,7 +137,8 @@ ggplot(length_summary, aes(x = mean_name_length, y = outcome)) +
 # blurb length plot
 ggplot(length_summary, aes(x = mean_blurb_length, y = outcome)) + 
   geom_bar(stat = "identity", aes(fill = outcome)) +
-  theme_minimal() + labs(x = "Mean Blurb Length (characters)", y = "Outcome", title = "Blurb Length by Outcome") + 
+  theme_minimal() + labs(x = "Mean Blurb Length (characters)", 
+                         y = "Outcome", title = "Blurb Length by Outcome") + 
   geom_label(aes(label = mean_blurb_length)) +
   scale_fill_manual(values=c("#05ce78", "#ed4752")) +
   theme(legend.position = "none")
@@ -180,8 +182,10 @@ blurb_sentiment <- new_text %>%
 tt_bing <- blurb_sentiment %>% 
   group_by(name, outcome) %>% 
   summarize(
-    sentiment_score = sum(sentiment == "positive") - sum(sentiment == "negative"),
-            tPos = sum(sentiment == "positive"), tNeg = sum(sentiment == "negative")
+    sentiment_score = sum(sentiment == "positive") - 
+      sum(sentiment == "negative"),
+    tPos = sum(sentiment == "positive"), 
+    tNeg = sum(sentiment == "negative")
     )
 # make table
 bing_tbl <- tt_bing %>% 
@@ -201,7 +205,8 @@ bing_tbl_pretty <- bing_tbl %>%
 ggplot(data = tt_bing, aes(x = sentiment_score, fill = outcome)) + 
   geom_histogram(bins = 15) +
   facet_grid(~outcome) + 
-  labs(title = "Blurb Sentiment Score by Outcome", x = "Sentiment Score (Bing lexicon)") + 
+  labs(title = "Blurb Sentiment Score by Outcome", 
+       x = "Sentiment Score (Bing lexicon)") + 
   scale_fill_manual(values = c("#ed4752", "#05ce78")) +
   theme_bw() +
   theme(legend.position = "none") 
@@ -241,7 +246,8 @@ afinn_tbl_pretty <- afinn_tbl %>%
 ggplot(data = tt_afinn, aes(x = sentiment_score, fill = outcome)) + 
   geom_histogram(bins = 15) +
   facet_grid(~outcome) + 
-  labs(title = "Blurb Sentiment Score by Outcome", x = "Sentiment Score (Afinn lexicon)") + 
+  labs(title = "Blurb Sentiment Score by Outcome",
+       x = "Sentiment Score (Afinn lexicon)") + 
   scale_fill_manual(values = c("#ed4752", "#05ce78")) +
   theme_bw() +
   theme(legend.position = "none") 
@@ -292,7 +298,8 @@ ggplot(data = staff_pick_success, aes(x = staff_pick, y = success_rate)) +
 ```{r Date Wrangling}
 # wrangling dates
 date_data <- kickstarter %>%
-  select(c("launched_at", "outcome", "proportion_funded", "pct_funded", "campaign_length")) %>%
+  select(c("launched_at", "outcome", "proportion_funded",
+           "pct_funded", "campaign_length")) %>%
   separate(launched_at, c("date", "time"), sep = " ") %>%
   mutate(month = months(as.Date(date)),
          day = weekdays(as.Date(date)),
@@ -331,7 +338,10 @@ p2 <- month_data %>%
   labs(title = "Success Rate by Launch Month", 
        x = "Month",
        y = "Success Rate") +
-  scale_x_discrete(limits = rev(c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))) +
+  scale_x_discrete(limits = rev(c("January", "February", "March", 
+                                  "April", "May", "June", 
+                                  "July", "August", "September",
+                                  "October", "November", "December"))) +
   geom_label(aes(label = round(success_rate, 3))) +
   theme_minimal()
 p2
@@ -415,7 +425,8 @@ gif_plot_year <- ggplot(year_data, aes(x = year, y = success_rate)) +
   scale_x_discrete(limits = 2009:2020)
 
 # saving line plot into a gif
-animate(gif_plot_year, duration = 6, fps = 40, width = 450, height = 400, renderer = gifski_renderer())
+animate(gif_plot_year, duration = 6, fps = 40, 
+        width = 450, height = 400, renderer = gifski_renderer())
 #anim_save("line-plot.gif")
 
 ```
@@ -488,7 +499,8 @@ In the multi-panel plot, created with the `facet_wrap()` function, we see this t
 goal_size <- kickstarter %>% 
   select(goal_usd, outcome) %>% 
   # cut up funding goals
-  group_by(cuts=cut(goal_usd, c(-1, 100, 1000, 10000, 100000, 1000000, Inf))) %>% 
+  group_by(cuts=cut(goal_usd, c(-1, 100, 1000, 10000, 
+                                100000, 1000000, Inf))) %>% 
   summarise(n = n(),
             success_rate = sum(outcome=="successful")/n) %>% 
   mutate(cuts = as.factor(cuts),
@@ -528,7 +540,11 @@ kickstarter_init <- kickstarter %>%
 
 # subset data to relevant variables
 kickstarter_subset <- kickstarter_init %>% 
-  select(backers_count, country_display_name_corrected, launched_at, spotlight, staff_pick, outcome, goal_usd, pledged_usd, campaign_length, main_category, sub_category, city, state, proportion_funded, name, blurb) %>% 
+  select(backers_count, country_display_name_corrected, 
+         launched_at, spotlight, staff_pick, 
+         outcome, goal_usd, pledged_usd, 
+         campaign_length, main_category, sub_category, 
+         city, state, proportion_funded, name, blurb) %>% 
   mutate(launch_month = month(launched_at),
          launch_day = wday(launched_at),
          name_length = str_length(name),
@@ -567,7 +583,8 @@ We begin by splitting our data set into training and testing sets. 70% of the Ki
 outcome_summary_tbl <- train %>% group_by(outcome) %>% summarise(n = n()) %>% 
   mutate(freq = round(n/sum(n), 4),
          outcome = ifelse(outcome == 1, "Successful", "Failed")) %>% 
-  rename("Outcome" = outcome, "Number of Campaigns" = n, "Frequency of Campaigns" = freq)
+  rename("Outcome" = outcome, "Number of Campaigns" = n, 
+         "Frequency of Campaigns" = freq)
 outcome_summary_tbl%>%  
   kbl() %>%
   kable_material("hover")
@@ -590,19 +607,26 @@ emplogitplot1(outcome ~ goal_usd, data = train, ngroups = 15, xlab = "goal ($)",
 train <- train %>% mutate(sqrt_goal_usd = sqrt(goal_usd))
 test <- test %>% mutate(sqrt_goal_usd = sqrt(goal_usd))
 
-emplogitplot1(outcome ~ sqrt_goal_usd, data = train, ngroups = 15, xlab = "sqrt(goal)", main = "Square Root Transformed Goal Empirical Logit Plot")
+emplogitplot1(outcome ~ sqrt_goal_usd, data = train, 
+              ngroups = 15, xlab = "sqrt(goal)", 
+              main = "Square Root Transformed Goal Empirical Logit Plot")
 ```
 
 #### Name Length
 ```{r}
 # QUANT PREDICTOR 2 - NAME LENGTH
-emplogitplot1(outcome ~ name_length, data = train, ngroups = 15, xlab = "name length (characters)", main = "Name Length Empirical Logit Plot")
+emplogitplot1(outcome ~ name_length, data = train, ngroups = 15, 
+              xlab = "name length (characters)", 
+              main = "Name Length Empirical Logit Plot")
 ```
 
 #### Campaign Length
 ```{r}
 # QUANT PREDICTOR 3 - CAMPAIGN LENGTH
-emplogitplot1(outcome ~ campaign_length, data = train, xlab = "campaign length (days)", ngroups = "all", main = "Campaign Length Emprical Logit Plot")
+emplogitplot1(outcome ~ campaign_length, data = train, 
+              xlab = "campaign length (days)", 
+              ngroups = "all", 
+              main = "Campaign Length Emprical Logit Plot")
 ```
 
 ### {-}
@@ -642,8 +666,9 @@ The predictor with the largest effect size is staff pick. The indicator variable
 
 ```{r}
 # get predicted values
-test.predicted.mod.final <-  predict(mod.final, newdata = test, type = "response")
-#table(test$outcome, test.predicted.mod.final > 0.5) %>% prop.table() %>% round(3)
+test.predicted.mod.final <-  predict(mod.final, 
+                                     newdata = test,
+                                     type = "response")
 conf.matrix <- table(test$outcome, test.predicted.mod.final > 0.5)
 
 # make pretty confusion matrix
@@ -652,7 +677,8 @@ pretty.conf.matrix <- as.data.frame(conf.matrix) %>%
   mutate(Var1 = as.character(Var1),
          Var1 = ifelse(Var1 == "0", "True Failure", "True Success")) %>% 
   gt() %>% 
-  cols_label(Var1 = " ", `FALSE` = "Predicted Failure", `TRUE` =  "Predicted Success") %>% 
+  cols_label(Var1 = " ", `FALSE` = "Predicted Failure", 
+             `TRUE` =  "Predicted Success") %>% 
   tab_header(title = md("Confusion Matrix")) %>% 
   tab_options(heading.title.font.size = 18) %>% 
   tab_style(
@@ -700,8 +726,14 @@ pretty.conf.matrix
 
 ```{r eval = FALSE}
 Accuracy(ifelse(test.predicted.mod.final >= .5, 1, 0), test$outcome)
-Precision(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive = 1) # true pos rate
-Recall(test$outcome, ifelse(test.predicted.mod.final >= .5, 1, 0), positive = 1) # sensitivity
+# true pos rate
+Precision(test$outcome, 
+          ifelse(test.predicted.mod.final >= .5, 1, 0), 
+          positive = 1) 
+# sensitivity
+Recall(test$outcome, 
+       ifelse(test.predicted.mod.final >= .5, 1, 0),
+       positive = 1) 
 ```
 
 $$Accuracy =  \frac{(TP + TN)}{(TP + TN + FP + FN)} = \frac{(24055 + 12808)}{(24055 + 12808 + 9477 + 4958)} = 0.7186$$

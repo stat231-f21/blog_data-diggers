@@ -78,6 +78,8 @@ The interactive table makes it easy to compare the success rates of the 15 Kicks
 
 To compare success rates for a specific category across states, we can use the map and select a category. Darker states have higher success rates in the selected category. For all categories, campaigns in Vermont, Massachusetts, and New York have the highest success rates while campaigns in South Dakota, Florida, and Mississippi have the lowest success rates. If we select Photography as a category for example, we can see that Nevada has the highest success rate by far, since it is a much darker shade of green than the other states. This may be explained by Nevada being home to the [Burning Man Festival](https://en.wikipedia.org/wiki/Burning_Man), for which successful Photography campaigns like [this](https://www.kickstarter.com/projects/zippylomax/dusty-playground?ref=discovery_category_most_funded&term=burning%20man) are centered around. 
 
+We used the [`ggplot2`](https://ggplot2.tidyverse.org/index.html) and [`ggiraph`](https://davidgohel.github.io/ggiraph/index.html) packages to make the map, and the [`miniUI`](https://github.com/rstudio/miniUI) package to add the table and map symbols in the app.  
+
 # Text Analysis of Kickstarter Names and Blurbs
 
 ## Text Length and Outcome {.tabset .tabset-fade .tabset-pills}
@@ -141,6 +143,9 @@ ggplot(length_summary, aes(x = mean_blurb_length, y = outcome)) +
 
 ```
 
+## {-}
+
+The name of a Kickstarter campaign refers to its title and the blurb refers to the short description below the title. The bar graph of name length shows that successful campaigns have a mean name length that is 3.7 characters longer than unsuccessful campaigns. There does not appear to be much of a difference in blurb length between successful and failed campaigns. 
 
 ## Sentiment Analysis of Kickstarter Blurbs {.tabset .tabset-fade .tabset-pills}
 
@@ -157,6 +162,8 @@ afinn_scores <- blurb_sentiment_fin %>%
   group_by(name, outcome) %>% 
   summarize(sentiment_score = sum(value))
 ```
+
+We used two different lexicons to perform our text analysis. First, we used the Bing lexicon, which categorizes words as either positive or negative. In order to calculate a sentiment score for each campaign, we added up the number of positive and negative words in their blurbs and then found the difference. Next, we used the Afinn lexicon, which categorizes words on a scale from -5 to 5, -5 being the most negative and 5 the most positive. To get a sentiment score for each campaign using the Afinn lexicon, we summed the score for each word the campaign's blurb. 
 
 
 ### Bing Lexicon
@@ -186,7 +193,7 @@ bing_tbl_pretty <- bing_tbl %>%
   mutate(mean_sent_score = round(mean_sent_score, 3)) %>% 
   select(outcome, mean_sent_score) %>% 
   rename(Outcome = outcome, 
-         "Mean Sentiment Score" = mean_sent_score) %>% 
+         "Mean Sentiment Score (Bing)" = mean_sent_score) %>% 
   kbl() %>%
   kable_material("hover")
 
@@ -225,7 +232,7 @@ afinn_tbl_pretty <- afinn_tbl %>%
   mutate(mean_sent_score = round(mean_sent_score, 3)) %>% 
   select(outcome, mean_sent_score) %>% 
   rename(Outcome = outcome, 
-         "Mean Sentiment Score" = mean_sent_score) %>% 
+         "Mean Sentiment Score (Afinn)" = mean_sent_score) %>% 
   kbl() %>%
   kable_material("hover")
 
@@ -241,10 +248,17 @@ ggplot(data = tt_afinn, aes(x = sentiment_score, fill = outcome)) +
 afinn_tbl_pretty
 ```
 
+## {-}
+
+The blurb sentiment graphs show that regardless of lexicon, the sentiment of blurbs is very similar between successful and failed campaigns. We can see that the distribution of sentiment scores is almost identical across outcomes for both lexicons. It appears that failed campaigns had a slightly higher mean sentiment score than successful campaigns for both lexicons, meaning that on average, the words in their blurbs are marginally more positive.   
 
 ## Comparison Word Cloud of Kickstarter Blurbs
 
 <iframe src="https://ddachille23.shinyapps.io/WordCloudApp/" height="780" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
+
+The comparison word cloud compares the relative frequency of words across failed and successful campaigns in the chosen category and sizes the words based on that relative frequency. For example, the words "enamel" and "pins" show up in both failed and successful art campaigns but show up many more times in successful campaigns, so they appear as large green words on the successful side. This would suggest that enamel pin projects tend to do well on Kickstarter. A comparison word cloud provides much more utility than a normal word cloud in this context because it allows you to see which words show up the most in successful and failed campaigns for each category. This word cloud provides granular information as to which campaigns tend to succeed in a way that other visualizations cannot. 
+
+We created this visualization using the `comparison.cloud()` function from the [`wordcloud`](https://github.com/cran/wordcloud) package. 
 
 
 # Univariate Analysis of Potential Predictors
@@ -704,22 +718,33 @@ $$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24055)}{(24055 + 4958)} = 0.8291$$
 
 The model's recall is 82.91%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 82.91% of the time (true positive rate). In other words, it correctly identifies 82.91% of all successful campaigns. 
 
+$$Sensitivity = \frac{(TN)}{(TN + FP)} = \frac{(12808)/(12808 + 9477)} = 0.5747$$
+The model's sensitivity is 57.47% meaning that of all the failed campaigns, the model correctly predicted them to fail 57.47% of the time (true negative rate). In other words, it correctly identifies 57.47% of all failed campaigns.  
+
 ## Model Takeaways
 
-Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones. The model's accuracy could potentially be improved in the future by other adding information not captured in our data set such as campaign [reward](https://www.kickstarter.com/help/handbook/rewards) pricing structure.
+Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by
+creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
+
+The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign [reward](https://www.kickstarter.com/help/handbook/rewards) pricing structure. 
 
 # Prediction App
 
 <iframe src="https://ddachille23.shinyapps.io/LogitModelApp/" height="650" width="720" style="border: 1px solid #464646;" data-external="1"></iframe>
 
+The prediction app makes it easy for the user to interact with our model in real time. The user simply enters the information about the Kickstarter campaign they are interested in starting or analyzing and the app tells them how likely that campaign is to succeed. It also helps the user see how certain attributes have a large impact on a campaigns chance of succeeding. When you change the staff pick option from true to false, the odds of succeeding drops by a factor of 13.7. For example, our model predicts that a 30 day photography campaign called "Amy D Photography" with a $5,000 goal launched on a Monday that is a staff pick has a 82.93% chance of succeeding while the same campaign has a 26.14% chance if it is not a staff pick. Converting from probability to odds, we see that the odds of the staff pick campaign succeeding is 4.8582 while the odds of the non-staff pick campaign succeeding is 0.3539. The ratio of those two odds gives us 13.7, and taking the natural log of 13.7 gives us the coefficient of the staff pick predictor in our model, 2.62.
+
+As far as we know, no other application exists that gives insights into a Kickstarter campaign's likelihood of succeeding based on its unique parameters. We could see Kickstarter implementing an application like this to help creators maximize their chances of succeeding.
+
 # Conclusion
 
-Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign. 
+Whether you're a prospective Kickstarter creator, data scientist, or curious onlooker, we hope this blog fostered a greater understanding of the factors that go into creating a successful Kickstarter campaign.
 
-So after reading this blog, you've decided on what your Kickstarter campaign will look like: Being from Vermont, you will create a campaign under the Publishing category and set a campaign goal of $2000 to be reached within 30 days. You will launch it on a Tuesday, maybe give it a fairly long title with 37 characters and ensure that your blurb somehow fits the words _book_, _children's_, and _illustrated_. And you really, really hope that your project get chosen for staff pick. You've got the perfect plan! Your campaign is bound to succeed...or is it? 
+So after reading this blog, you've decided on what your Kickstarter campaign will look like: Being from Vermont, you will create a campaign under the Publishing category and set a campaign goal of $2000 to be reached within 30 days. You will launch it on a Tuesday, maybe give it a fairly long title with 37 characters and ensure that your blurb somehow fits the words _book_, _children's_, and _illustrated_. And you really, really hope that your project gets chosen for staff pick. You've got the perfect plan! Your campaign is bound to succeed...or is it?
 
+While our blog analyzes data from Kickstarter campaigns itself, there are important limitations to the information we present. For example, we simply did not have access to data for the types of rewards creators might set, of every single Kickstarter ever created since 2009, or of the topic of each project (so while the category may be Games, is the campaign funding for a board game? A video game? A puzzle?). What about a trend during a certain period of time that made some projects more popular than others, the demographics of backers, or even the probability of a project failing after its success on Kickstarter?
 
-
+All in all, while some of the results we conveyed can guide your campaign, do not let these findings control every aspect of your Kickstarter process. Ultimately, the probability of success might just depend on the right project at the right time, or who knows, maybe Tuesday really is the only good day to start a campaign. 
 
 
 # References

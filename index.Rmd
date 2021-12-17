@@ -466,7 +466,7 @@ ggplot(camplength2, aes(x = campaign_length, y = success_rate, size = n)) +
 
 In 2011, a year prior to the change in campign length, there is a moderately strong, negative, and roughly linear association between campaign length and success rate. So as the campaign length increases, the success rate decreases. 
 
-In the multi-panel plot, created with the `facet_wrap()` function, we see this trend from 2011 continue as the number of campaigns begin to increase significantly. Most of the campaigns in 2012-2020 set a campaign length of approximately 30 days and are more successful than campaigns with much longer campaign lengths. We predict this is because 30 days suggests a greater level of urgency for a project to be backed, especially if it is something that prompts a lot of interest. Meanwhile, shorter campaign lengths generally do not give projects enough time to reach a larger audience of backers to pledge the necessary amount for the campaign goal to be reached. 
+In the multi-panel plot, created with the `facet_wrap()` function, we see this trend from 2011 continue as the number of campaigns begin to increase significantly. Most of the campaigns in 2012-2020 set a campaign length of approximately 30 days and are more successful than campaigns with much longer campaign lengths. We predict this is because 30 days suggests a greater level of urgency for a project to be backed, especially if it is something that prompts a lot of interest. 
 
 ### Goal Size
 ```{r}

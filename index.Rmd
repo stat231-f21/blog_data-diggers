@@ -42,13 +42,15 @@ options(knitr.kable.NA = '')
 
 ## What is Kickstarter?
 
-Kickstarter, founded in 2009, is an online crowdfunding platform. Their mission is to help "bring creative projects to life" (Kickstarter, 2009) as individuals can create projects that draw others to support the process. 
+Kickstarter is an online crowdfunding platform founded in 2009. Their mission is to help "bring creative projects to life" by building a community that supports creators (Kickstarter, 2009).
 
-Through the platform, creators can select from a variety of categories to best represent their project topic, set a campaign length, and set a funding goal, among other campaign descriptors. Essentially, creators have full control of how they present their vision to others. If a project is promising, backers—people who support a project—can pledge any amount of money to support the process. Creators can also set rewards to backers who pledge certain amounts of money. If the project does not reach its goal by the end of the campaign length, no money is lost. But if a project is successful, the funds go to bringing the project to fruition. 
+On the platform, creators can choose one of the fifteen categories, set a campaign length, and set a funding goal, among other campaign descriptors. Creators have full control of how they present their vision to others on their project pages. If a project looks promising, backers&mdash;&#150;people who support projects&mdash;&#150;can pledge any amount of money to support the process. Creators can also give rewards to backers who pledge certain amounts of money. If the project does not reach its goal by the end of the campaign, backers get their money back. If a project is successful, creators use the funds to bring their project to fruition. 
 
 ## What was our motivation?
 
-As more individual and creative projects are soaring, we wanted to analyze the trend of Kickstarter projects throughout the years and determine if we could predict the probability of success of a launched project. Ultimately, we want to understand what factors go into making a successful campaign, if any. For anyone wanting to launch a campaign of their own, this blog is intended to support prospective creators in the process. From writing a strong project description to determining the best launch day, we want to inspire creators as they embark on their creative endeavors. 
+While Kickstarter makes it easy to explore projects on their website, they do not have many tools that let you explore the underlying trends in Kickstarter campaigns. We were interested in digging deeper to understand what attributes the most successful campaigns have. If we could uncover the features of Kickstarter campaigns that drive success, then we could help creators optimize their projects. 
+
+From writing a strong project description to determining the best launch day, we want to inspire creators as they embark on their creative endeavors. As crowdfunding continues to grow in popularity, more and people will benefit from analyses like these. 
 
 ## How did we get the data?
 
@@ -524,6 +526,7 @@ ggplot(goal_size, aes(x = reorder(cuts_clean, -success_rate),
 
 ```
 
+This graph shows that as goal size increases, success rate decreases. This makes sense since it is easier for a campaign to reach their goal if they don't ask for a lot of money. Campaigns with a goal from \$0-\$100 USD had a 73.7% success rate while campaigns with a goal over \$1,000,000 had a meager 1.5% success rate. 
 
 
 # Multivariable Thinking With a Logistic Regression Model
@@ -750,13 +753,12 @@ $$Recall =  \frac{(TP)}{(TP + FN)} = \frac{(24055)}{(24055 + 4958)} = 0.8291$$
 
 The model's recall is 82.91%, meaning that of all the successful campaigns, the model correctly predicted them to be successful 82.91% of the time (true positive rate). In other words, it correctly identifies 82.91% of all successful campaigns. 
 
-$$Sensitivity = \frac{(TN)}{(TN + FP)} = \frac{(12808)/(12808 + 9477)} = 0.5747$$
-The model's sensitivity is 57.47% meaning that of all the failed campaigns, the model correctly predicted them to fail 57.47% of the time (true negative rate). In other words, it correctly identifies 57.47% of all failed campaigns.  
+$$Specificity = \frac{(TN)}{(TN + FP)} = \frac{(12808)}{(12808 + 9477)} = 0.5747$$
+The model's specificity is 57.47% meaning that of all the failed campaigns, the model correctly predicted them to fail 57.47% of the time (true negative rate). In other words, it correctly identifies 57.47% of all failed campaigns.  
 
 ## Model Takeaways
 
-Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by
-creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
+Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
 
 The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign [reward](https://www.kickstarter.com/help/handbook/rewards) pricing structure. 
 
@@ -774,9 +776,9 @@ Whether you're a prospective Kickstarter creator, data scientist, or curious onl
 
 So after reading this blog, you've decided on what your Kickstarter campaign will look like: Being from Vermont, you will create a campaign under the Publishing category and set a campaign goal of $2000 to be reached within 30 days. You will launch it on a Tuesday, maybe give it a fairly long title with 37 characters and ensure that your blurb somehow fits the words _book_, _children's_, and _illustrated_. And you really, really hope that your project gets chosen for staff pick. You've got the perfect plan! Your campaign is bound to succeed...or is it?
 
-While our blog analyzes data from Kickstarter campaigns itself, there are important limitations to the information we present. For example, we simply did not have access to data for the types of rewards creators might set, of every single Kickstarter ever created since 2009, or of the topic of each project (so while the category may be Games, is the campaign funding for a board game? A video game? A puzzle?). What about a trend during a certain period of time that made some projects more popular than others, the demographics of backers, or even the probability of a project failing after its success on Kickstarter?
+It is important to acknowledge the limitations of our analysis. For example, we did not have access to data on the types of rewards creators set in their campaigns. We also did not account for the demographics of backers, fads that made some projects more popular than others over a short interval of time, or the probability of a company failing after a successful Kickstarter campaign.
 
-All in all, while some of the results we conveyed can guide your campaign, do not let these findings control every aspect of your Kickstarter process. Ultimately, the probability of success might just depend on the right project at the right time, or who knows, maybe Tuesday really is the only good day to start a campaign. 
+While some of the results we conveyed can guide your campaign, do not let these findings control every aspect of your Kickstarter process. Ultimately, the probability of success might just depend on launching the right project at the right time, or who knows, maybe Tuesday really is the only good day to start a campaign. 
 
 
 # References

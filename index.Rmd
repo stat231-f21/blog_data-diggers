@@ -435,7 +435,7 @@ animate(gif_plot_year, duration = 6, fps = 40,
 
 Animated with the [`gganimate`](https://gganimate.com/) package, the above time series plot shows that the success rates of Kickstarter campaigns in its early years remained constant at above a 75% success rate. However, after 2013, there was a significant dip from 80% to a whopping 44% success rate by 2015. So how do we explain this drop in the trend of successful campaigns from 2013-2015? 
 
-Laura Lewis, an Amazon data scientist who examined Kickstarter success trends throughout the years, created a time series plot with the total number of launched projects each year from 2009-2019. She found that by 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched in 2014 (Lewis, 2019). Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
+[Laura Lewis](https://medium.com/@lvlewis8), an Amazon data scientist who examined Kickstarter success trends throughout the years, created a [time series plot](https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743#:~:text=Changes%20over%20time%20in%20the%20number%20of%20projects%20launched%20on%20Kickstarter) with the total number of launched projects each year from 2009-2019. She found that midway through 2014, Kickstarter saw a significant rise in campaigns with a peak of over 4000 projects launched. Thus, the proportion of successful projects decreased as the number of launched projects increased. Nevertheless, the site has seen considerable improvement in success rates in recent years while the number of launched projects have remained fairly constant since 2016. 
 
 
 
@@ -663,9 +663,11 @@ The chi-squared test returns a significant p-value an alpha level of 0.05 for th
 
 ## Final Model Interpretation
 
-The predictor with the largest effect size is staff pick. The indicator variable that corresponds to staff pick being true has a coefficient of 2.62 with an extremely small p-value. An intercept of 2.62 means that the estimated odds of success for a campaign that is a staff pick is 13.7 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors (since $e^\hat\beta = odds\space ratio$). The predictor with the next largest effect size is the indicator variable that corresponds to the comic category, with a coefficient of 1.48 and an extremely small p-value. An intercept of 1.48 means that the estimated odds of success for a comic book campaign is 4.40 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
+The predictor with the largest significant effect size is staff pick, with a corresponding odds ratio of $\exp(\hat \beta) = \exp(2.62) = 13.7$. This means that the estimated odds of success for a campaign that is a staff pick is 13.7 times higher than a campaign that is not a staff pick, after accounting for the effect of the other predictors. The predictor with the next largest significant effect size is the indicator variable that corresponds to the comic category, with a corresponding odds ratio of $\exp(\hat \beta) = \exp(1.48) = 4.4$. This means that the estimated odds of success for a comic book campaign is 4.40 times higher than a campaign with the baseline category, art, after accounting for the effect of the other predictors.  
 
 ## Model Evaluation
+
+We evaluated the model using accuracy, precision, recall, and specificity, which are calculated using the counts of the true positive (TP), true negative (TN), false positive (FP) and false negative (FN) results.
 
 ```{r}
 # get predicted values
@@ -758,7 +760,7 @@ The model's specificity is 57.47% meaning that of all the failed campaigns, the 
 
 ## Model Takeaways
 
-Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a 71% accuracy score (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
+Given the features in our data set, we are satisfied with the accuracy of our final model. Our model's classification abilities were similar to Amazon data scientist Laura Lewis' final model, as her model had a [71% accuracy score](https://towardsdatascience.com/using-machine-learning-to-predict-kickstarter-success-e371ab56a743#:~:text=run%3A%2048.56%20minutes-,Best%20accuracy%3A%200.71,-Best%20parameters%3A%20%7B%E2%80%98clf__C) (less than 1% different). Like Laura's model, our model is better at predicting successful campaigns than failed ones, since the model's true positive rate is much larger than its true negative rate. Our model could be used by creators to help them gauge how likely they are to reach their goal. Our model is also useful for backers, because it will help them get an idea as to how likely they are to receive their rewards.
 
 The model's accuracy could potentially be improved in the future by adding other information not captured in our data set such as campaign reward pricing structure. 
 
